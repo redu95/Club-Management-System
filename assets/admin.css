@@ -44,3 +44,17 @@ nav ul li:hover ul {
 #content {
     padding: 20px;
 }
+
+ /* Style changes for better visibility */
+ .admin-btn {
+     background-color: #4CAF50;
+     color: white;
+     border: none;
+     padding: 8px 12px;
+     text-align: center;
+     text-decoration: none;
+     display: inline-block;
+     font-size: 14px;
+     margin: 4px 2px;
+     cursor: pointer;
+ }

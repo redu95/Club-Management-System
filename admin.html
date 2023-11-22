@@ -5,52 +5,189 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/admin.css">
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </head>
 
+
 <body>
-    <nav class="sidenav">
-        <ul>
-            <li id="membersLink"><a href="#">Members</a></li>
-            <li><a href="#">Events</a>
-                <ul>
-                    <li><a href="#">Add Event</a></li>
-                    <li><a href="#">Edit Event</a></li>
-                    <li><a href="#">Remove Event</a></li>
-                    <li><a href="#">List Events</a></li>
-                </ul>
-            </li>
-            <li><a href="#">Reports</a>
-                <ul>
-                    <li><a href="#">Membership Statistics</a></li>
-                </ul>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" id="membersLink" href="#">Members <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Reports</a>
+                </li>
+            </ul>
+        </div>
     </nav>
 
-    <!-- Container to display members' data -->
-    <div id="membersContainer"></div>
+    <!-- Add Member Button -->
+    <div class="container mt-4">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">
+            Add Member
+        </button>
+    </div>
+    
 
-    <!-- Add this script in your admin.html file -->
+    <!-- Container to display members' data -->
+    <div class="container mt-4">
+        <table class="table" id="membersTable">
+            <thead class="thead-dark">
+                <!-- Table header with column names -->
+                <tr>
+                    <th>User ID</th>
+                    <th>User Name</th>
+                    <th>User Password</th>
+                    <th>User Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div class="modal" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMemberModalLabel">Add Member</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for adding a new member -->
+                    <form id="addMemberForm">
+                        <div class="form-group">
+                            <label for="newUserName">User Name</label>
+                            <input type="text" class="form-control" id="newUserName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPassword">User Password</label>
+                            <input type="password" class="form-control" id="newUserPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserRole">User Role</label>
+                            <input type="text" class="form-control" id="newUserRole" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
     <script>
-        // Function to display user data in the adminContent div
+        // Function to display user data in the membersTable
         function displayUserData(users) {
-            var membersContainer = document.getElementById("membersContainer");
+            var membersTable = document.getElementById("membersTable");
+            var tbody = membersTable.getElementsByTagName("tbody")[0];
 
             // Clear previous content
-            membersContainer.innerHTML = "";
+            tbody.innerHTML = "";
 
             // Display user data
             users.forEach(function (user) {
-                var userDiv = document.createElement("div");
-                userDiv.innerHTML = "<p>" + user.user_name + "</p>"; // Adjust this based on your table structure
-                membersContainer.appendChild(userDiv);
+                var row = tbody.insertRow();
+
+                // Add cells with data
+                row.insertCell(0).textContent = user.user_id;
+                row.insertCell(1).textContent = user.user_name;
+                row.insertCell(2).textContent = user.user_pass;
+                row.insertCell(3).textContent = user.user_role; 
+
+                // New cell for buttons
+                var actionCell = row.insertCell(4);
+
+                // Add buttons for each row
+                var editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.className = "admin-btn";
+                editButton.addEventListener("click", function () {
+                    editUser(user.user_id, user.user_role);
+                });
+                actionCell.appendChild(editButton);
+
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.className = "admin-btn";
+                deleteButton.addEventListener("click", function () {
+                    deleteUser(user.user_id);
+                });
+                actionCell.appendChild(deleteButton);
             });
         }
 
-        // Event listener for the "Members" link
-        document.getElementById("membersLink").addEventListener("click", function () {
-            // Fetch members' data from the server using AJAX
+        // Function to handle editing a user
+        function editUser(userId, currentRole) {
+            // Prompt the user for the new role
+            var newRole = prompt("Enter the new role for the user:", currentRole);
+
+            if (newRole !== null) {
+                // Send an AJAX request to update the user's role in the database
+                var xhr = new XMLHttpRequest();
+                xhr.open("PUT", "/admin/edit-user/" + userId + "/" + newRole, true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        // Refresh the member list after editing
+                        fetchMemberData();
+                    }
+                };
+
+                xhr.send();
+            }
+        }
+
+        // Function to handle deleting a user
+        function deleteUser(userId) {
+            // Confirm with the user before deletion
+            var confirmDelete = confirm("Are you sure you want to delete this user?");
+
+            if (confirmDelete) {
+                // Send an AJAX request to delete the user from the database
+                var xhr = new XMLHttpRequest();
+                xhr.open("DELETE", "/admin/delete-user/" + userId, true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        // Refresh the member list after deletion
+                        fetchMemberData();
+                    }
+                };
+
+                xhr.send();
+            }
+        }
+
+        // Function to fetch members' data from the server
+        function fetchMemberData() {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "/admin/members", true);
 
@@ -62,6 +199,12 @@
             };
 
             xhr.send();
+        }
+
+        // Event listener for the "Members" link
+        document.getElementById("membersLink").addEventListener("click", function () {
+            // Fetch members' data from the server using AJAX
+            fetchMemberData();
         });
     </script>
 </body>

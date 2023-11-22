@@ -5,31 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Area</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/member.css">
 </head>
 
 <body>
-    <nav class="sidenav">
-        <ul>
-            <li><a href="#">My Profile</a>
-                <ul>
-                    <li><a href="#">View Profile</a></li>
-                    <li><a href="#">Edit Profile</a></li>
-                </ul>
-            </li>
-            <li><a href="#">Events</a>
-                <ul>
-                    <li><a href="#">Upcoming Events</a></li>
-                    <li><a href="#">Past Events</a></li>
-                </ul>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Member Area</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        My Profile
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="profileDropdown">
+                        <a class="dropdown-item" href="#">View Profile</a>
+                        <a class="dropdown-item" href="#">Edit Profile</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="eventsLink">Events</a>
+                    <div class="dropdown-menu" id="eventsDropdown" aria-labelledby="eventsLink">
+                        <a class="dropdown-item" href="#">Upcoming Events</a>
+                        <a class="dropdown-item" href="#">Past Events</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </nav>
 
-    <div id="page-content">
-        <h1>Member Area</h1>
+    <div class="container mt-4">
+        <!-- Your content goes here -->
     </div>
 
+    <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        // Display the dropdown menu when the "Events" text is clicked
+        document.getElementById("eventsLink").addEventListener("click", function () {
+            document.getElementById("eventsDropdown").classList.toggle("show");
+        });
+
+        // Close the dropdown menu if the user clicks outside of it
+        window.onclick = function (event) {
+            if (!event.target.matches('#eventsLink')) {
+                var dropdowns = document.getElementsByClassName("dropdown-menu");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.classList.contains('show')) {
+                        openDropdown.classList.remove('show');
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>

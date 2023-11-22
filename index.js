@@ -8,3 +8,4 @@ document.getElementById("loginForm").addEventListener("submit", function (event)
         document.getElementById("memberContent").style.display = "block";
     }
 });
+
