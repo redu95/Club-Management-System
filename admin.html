@@ -8,48 +8,62 @@
     <link rel="stylesheet" href="assets/admin.css">
 </head>
 
-    <body>
-        <nav class="sidenav">
-            <ul>
-                <li><a href="#">Members</a>
-                    <!-- <ul>
-                        <li><a href="#">Add Member</a></li>
-                        <li><a href="#">Edit Member</a></li>
-                        <li><a href="#">Remove Member</a></li>
-                        <li><a href="#">List Members</a></li>
-                    </ul> -->
-                </li>
-                <li><a href="#">Events</a>
-                    <ul>
-                        <li><a href="#">Add Event</a></li>
-                        <li><a href="#">Edit Event</a></li>
-                        <li><a href="#">Remove Event</a></li>
-                        <li><a href="#">List Events</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Reports</a>
-                    <ul>
-                        <li><a href="#">Membership Statistics</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </nav>
-        <!-- Add this script in your admin.html file -->
-        <script>
-            // Function to display user data in the adminContent div
-            function displayUserData(users) {
-                var adminContent = document.getElementById("adminContent");
+<body>
+    <nav class="sidenav">
+        <ul>
+            <li id="membersLink"><a href="#">Members</a></li>
+            <li><a href="#">Events</a>
+                <ul>
+                    <li><a href="#">Add Event</a></li>
+                    <li><a href="#">Edit Event</a></li>
+                    <li><a href="#">Remove Event</a></li>
+                    <li><a href="#">List Events</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Reports</a>
+                <ul>
+                    <li><a href="#">Membership Statistics</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
 
-                // Clear previous content
-                adminContent.innerHTML = "";
+    <!-- Container to display members' data -->
+    <div id="membersContainer"></div>
 
-                // Display user data
-                users.forEach(function (user) {
-                    var userDiv = document.createElement("div");
-                    userDiv.innerHTML = "<p>" + user.user_name + "</p>"; // Adjust this based on your table structure
-                    adminContent.appendChild(userDiv);
-                });
-            }
-        </script>
-    </body>    
+    <!-- Add this script in your admin.html file -->
+    <script>
+        // Function to display user data in the adminContent div
+        function displayUserData(users) {
+            var membersContainer = document.getElementById("membersContainer");
 
+            // Clear previous content
+            membersContainer.innerHTML = "";
+
+            // Display user data
+            users.forEach(function (user) {
+                var userDiv = document.createElement("div");
+                userDiv.innerHTML = "<p>" + user.user_name + "</p>"; // Adjust this based on your table structure
+                membersContainer.appendChild(userDiv);
+            });
+        }
+
+        // Event listener for the "Members" link
+        document.getElementById("membersLink").addEventListener("click", function () {
+            // Fetch members' data from the server using AJAX
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/admin/members", true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var users = JSON.parse(xhr.responseText);
+                    displayUserData(users);
+                }
+            };
+
+            xhr.send();
+        });
+    </script>
+</body>
+
+</html>

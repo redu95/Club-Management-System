@@ -37,7 +37,8 @@ app.get("/admin", function (req, res) {
         }
 
         // Render the admin.html page with the fetched data
-        res.render("admin.html", { users: results });
+        res.sendFile(__dirname + "/admin.html");
+
     });
 });
 
@@ -79,7 +80,23 @@ app.post("/", encoder, function (req, res) {
         }
     );
 });
+//--------------------------
 
+// Handle GET requests for members' data
+app.get("/admin/members", function (req, res) {
+    connection.query("SELECT * FROM loginuser", function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).json({ error: "Internal Server Error" });
+            return;
+        }
+
+        // Respond with the fetched data in JSON format
+        res.json(results);
+    });
+});
+
+//-----------------------------
 // Middleware to check if the user is authenticated
 const authenticateUser = (req, res, next) => {
     if (req.session && req.session.user) {
