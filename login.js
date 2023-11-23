@@ -130,6 +130,33 @@ app.get("/", function (req, res) {
     res.sendFile(__dirname + "/index.html");
 });
 
+// Handle GET requests for the member area
+app.get("/member", function (req, res) {
+    // Fetch user data based on the session information
+    const userId = req.session.user && req.session.user.id;
+
+    if (userId) {
+        connection.query("SELECT * FROM loginuser WHERE user_id = ?", [userId], function (error, results, fields) {
+            if (error) {
+                console.error("Database query error:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Check if user data is found
+            if (results.length > 0) {
+                // Render the member.html page with the fetched data
+                res.render(__dirname + "/member.html", { user: results[0] });
+            } else {
+                res.status(404).send("User not found");
+            }
+        });
+    } else {
+        res.redirect("/");
+    }
+});
+
+
 // Set the app port
 const PORT = 3600;
 app.listen(PORT, () => {
