@@ -206,6 +206,53 @@
             // Fetch members' data from the server using AJAX
             fetchMemberData();
         });
+
+        //==================Add memebers section=============
+        // Function to handle form submission
+        function handleAddMemberForm(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            // Get form data
+            var newUserName = document.getElementById("newUserName").value;
+            var newUserPassword = document.getElementById("newUserPassword").value;
+            var newUserRole = document.getElementById("newUserRole").value;
+
+            // Log the values before sending the AJAX request
+            console.log("New User Name:", newUserName);
+            console.log("New User Password:", newUserPassword);
+            console.log("New User Role:", newUserRole);
+
+            // Send an AJAX request to add a new user
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/admin/add-user", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Refresh the member list after adding a new member
+                        fetchMemberData();
+                        $('#addMemberModal').modal('hide'); // Hide the modal
+                    } else {
+                        // Handle the error case
+                        console.error("Error adding a new member:", xhr.status, xhr.statusText);
+                    }
+                }
+            };
+
+            // Convert data to JSON and send
+            var data = JSON.stringify({
+                user_name: newUserName,
+                user_pass: newUserPassword,
+                user_role: newUserRole
+            });
+            xhr.send(data);
+        }
+
+        // Attach the event listener to the form
+        document.getElementById("addMemberForm").addEventListener("submit", handleAddMemberForm);
+        //=====================================================
     </script>
 </body>
 

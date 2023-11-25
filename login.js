@@ -10,6 +10,7 @@ const bcrypt = require('bcrypt');
 app.use("/assets", express.static("assets"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
+app.use(express.json()); // Add this line to parse JSON data
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -254,8 +255,38 @@ app.post("/", encoder, function (req, res) {
 
 
 //===================================================================
+app.use(express.urlencoded({ extended: true })); // Add this line to parse form data
 
-//=========================== //======================
+//===========================Add memeber for Admin side==================
+
+// Handle POST requests for adding a new user
+app.post("/admin/add-user", encoder, function (req, res) {
+    console.log("Request Body:", req.body);
+
+    var newUserName = req.body.user_name;
+    var newUserPassword = req.body.user_pass;
+    var newUserRole = req.body.user_role;
+
+    // Add the new user to the loginuser table
+    connection.query(
+        "INSERT INTO loginuser (user_name, user_pass, user_role) VALUES (?, ?, ?)",
+        [newUserName, newUserPassword, newUserRole],
+        function (error, results, fields) {
+            if (error) {
+                console.error("Error adding a new user:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Respond with a success message
+            res.send("New user added successfully");
+            console.log("New user added successfully");
+        }
+    );
+});
+
+
+//========================================================================
 
 
 // Set the app port
