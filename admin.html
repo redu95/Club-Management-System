@@ -164,27 +164,45 @@
                 xhr.send();
             }
         }
-
+        //==========Deletion of an member===================
         // Function to handle deleting a user
-        function deleteUser(userId) {
-            // Confirm with the user before deletion
-            var confirmDelete = confirm("Are you sure you want to delete this user?");
-
-            if (confirmDelete) {
-                // Send an AJAX request to delete the user from the database
+            function deleteUser(userId) {
+                // Fetch user data for confirmation
                 var xhr = new XMLHttpRequest();
                 xhr.open("DELETE", "/admin/delete-user/" + userId, true);
 
                 xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        // Refresh the member list after deletion
-                        fetchMemberData();
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            var confirmationData = JSON.parse(xhr.responseText);
+
+                            // Open a modal for confirmation
+                            var confirmDelete = confirm("Are you sure you want to delete this user?\n\n" +
+                                "User ID: " + confirmationData.user.user_id + "\n" +
+                                "User Name: " + confirmationData.user.user_name);
+
+                            if (confirmDelete) {
+                                // Send a DELETE request to confirm deletion
+                                var confirmDeleteXhr = new XMLHttpRequest();
+                                confirmDeleteXhr.open("DELETE", "/admin/delete-user/" + userId + "/confirm", true);
+
+                                confirmDeleteXhr.onreadystatechange = function () {
+                                    if (confirmDeleteXhr.readyState === 4 && confirmDeleteXhr.status === 200) {
+                                        // Refresh the member list after deletion
+                                        fetchMemberData();
+                                    }
+                                };
+
+                                confirmDeleteXhr.send();
+                            }
+                        }
                     }
                 };
 
                 xhr.send();
             }
-        }
+
+        //=================================================
 
         // Function to fetch members' data from the server
         function fetchMemberData() {

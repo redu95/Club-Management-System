@@ -288,6 +288,51 @@ app.post("/admin/add-user", encoder, function (req, res) {
 
 //========================================================================
 
+//====================Deletion===========================================
+
+// Handle DELETE requests for deleting a user
+app.delete("/admin/delete-user/:userId", function (req, res) {
+    const userId = req.params.userId;
+
+    // Fetch user data based on the user ID
+    connection.query("SELECT * FROM loginuser WHERE user_id = ?", [userId], function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Check if user data is found
+        if (results.length > 0) {
+            // Respond with a confirmation message and user data
+            res.json({ confirmation: "Please confirm deletion", user: results[0] });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    });
+});
+
+// Handle the actual DELETE request for user deletion
+app.delete("/admin/delete-user/:userId/confirm", function (req, res) {
+    const userId = req.params.userId;
+
+    // Delete the user from the loginuser table
+    connection.query("DELETE FROM loginuser WHERE user_id = ?", [userId], function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Respond with a success message
+        res.send("User deleted successfully");
+        console.log("User deleted successfully");
+    });
+});
+
+
+//========================================================================
+
 
 // Set the app port
 const PORT = 3200;
