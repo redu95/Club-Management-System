@@ -51,10 +51,10 @@
             <thead class="thead-dark">
                 <!-- Table header with column names -->
                 <tr>
-                    <th>User ID</th>
+                    <th> ID</th>
                     <th>User Name</th>
-                    <th>User Password</th>
-                    <th>User Role</th>
+                    <th>Sex</th>
+                    <th>Role</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -90,6 +90,11 @@
                             <label for="newUserRole">User Role</label>
                             <input type="text" class="form-control" id="newUserRole" required>
                         </div>
+                        <div class="form-group">
+                            <label for="newUserSex">Sex</label>
+                            <input type="text" class="form-control" id="newUserSex" required>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>
                 </div>
@@ -119,7 +124,7 @@
                 // Add cells with data
                 row.insertCell(0).textContent = user.user_id;
                 row.insertCell(1).textContent = user.user_name;
-                row.insertCell(2).textContent = user.user_pass;
+                row.insertCell(2).textContent = user.user_sex;
                 row.insertCell(3).textContent = user.user_role;
 
                 // New cell for buttons
@@ -127,7 +132,7 @@
 
                 // Add buttons for each row
                 var editButton = document.createElement("button");
-                editButton.textContent = "Edit";
+                editButton.textContent = "Edit Role";
                 editButton.className = "admin-btn";
                 editButton.addEventListener("click", function () {
                     editUser(user.user_id, user.user_role);
@@ -230,47 +235,49 @@
         });
 
         //==================Add memebers section=============
-        // Function to handle form submission
         function handleAddMemberForm(event) {
-            event.preventDefault(); // Prevent the default form submission behavior
+                event.preventDefault();
 
-            // Get form data
-            var newUserName = document.getElementById("newUserName").value;
-            var newUserPassword = document.getElementById("newUserPassword").value;
-            var newUserRole = document.getElementById("newUserRole").value;
+                // Get form data
+                var newUserName = document.getElementById("newUserName").value;
+                var newUserPassword = document.getElementById("newUserPassword").value;
+                var newUserRole = document.getElementById("newUserRole").value;
+                var newUserSex = document.getElementById("newUserSex").value; // New line
 
-            // Log the values before sending the AJAX request
-            console.log("New User Name:", newUserName);
-            console.log("New User Password:", newUserPassword);
-            console.log("New User Role:", newUserRole);
+                // Log the values before sending the AJAX request
+                console.log("New User Name:", newUserName);
+                console.log("New User Password:", newUserPassword);
+                console.log("New User Role:", newUserRole);
+                console.log("New User Sex:", newUserSex); // New line
 
-            // Send an AJAX request to add a new user
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/admin/add-user", true);
-            xhr.setRequestHeader("Content-Type", "application/json");
+                // Send an AJAX request to add a new user
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/admin/add-user", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
 
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        // Refresh the member list after adding a new member
-                        fetchMemberData();
-                        $('#addMemberModal').modal('hide'); // Hide the modal
-                    } else {
-                        // Handle the error case
-                        console.error("Error adding a new member:", xhr.status, xhr.statusText);
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            // Refresh the member list after adding a new member
+                            fetchMemberData();
+                            $('#addMemberModal').modal('hide'); // Hide the modal
+                        } else {
+                            // Handle the error case
+                            console.error("Error adding a new member:", xhr.status, xhr.statusText);
+                        }
                     }
-                }
-            };
+                };
 
-            // Convert data to JSON and send
-            var data = JSON.stringify({
-                user_name: newUserName,
-                user_pass: newUserPassword,
-                user_role: newUserRole
-            });
-            xhr.send(data);
-        }
+                // Convert data to JSON and send
+                var data = JSON.stringify({
+                    user_name: newUserName,
+                    user_pass: newUserPassword,
+                    user_role: newUserRole,
+                    user_sex: newUserSex // New line
+                });
+                xhr.send(data);
+            }
+
 
         // Attach the event listener to the form
         document.getElementById("addMemberForm").addEventListener("submit", handleAddMemberForm);

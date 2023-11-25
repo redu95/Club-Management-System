@@ -259,18 +259,18 @@ app.use(express.urlencoded({ extended: true })); // Add this line to parse form 
 
 //===========================Add memeber for Admin side==================
 
-// Handle POST requests for adding a new user
 app.post("/admin/add-user", encoder, function (req, res) {
-    console.log("Request Body:", req.body);
-
     var newUserName = req.body.user_name;
     var newUserPassword = req.body.user_pass;
     var newUserRole = req.body.user_role;
+    var newUserSex = req.body.user_sex; // New line
+
+    console.log("User Sex:", newUserSex);
 
     // Add the new user to the loginuser table
     connection.query(
-        "INSERT INTO loginuser (user_name, user_pass, user_role) VALUES (?, ?, ?)",
-        [newUserName, newUserPassword, newUserRole],
+        "INSERT INTO loginuser (user_name, user_pass, user_role, user_sex) VALUES (?, ?, ?, ?)",
+        [newUserName, newUserPassword, newUserRole, newUserSex], // New line
         function (error, results, fields) {
             if (error) {
                 console.error("Error adding a new user:", error);
@@ -280,10 +280,10 @@ app.post("/admin/add-user", encoder, function (req, res) {
 
             // Respond with a success message
             res.send("New user added successfully");
-            console.log("New user added successfully");
         }
     );
 });
+
 
 
 //========================================================================
