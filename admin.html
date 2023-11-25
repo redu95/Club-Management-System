@@ -17,19 +17,20 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <a class="navbar-brand" href="#">CSEC ASTU</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item active">
-                    <a class="nav-link" id="membersLink" href="#">Members <span class="sr-only">(current)</span></a>
-                </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Events</a>
+                    <a class="nav-link" href="#">Home</a>
                 </li>
+                <li class="nav-item active">
+                    <a class="nav-link" id="membersLink" href="#">Members List <span class="sr-only">(current)</span></a>
+                </li>
+                
                 <li class="nav-item">
                     <a class="nav-link" href="#">Reports</a>
                 </li>
@@ -37,8 +38,14 @@
         </div>
     </nav>
 
+    <!-- Container to display dynamic content -->
+    <div class="container mt-4" id="content-container">
+        
+    </div>
+
+
     <!-- Add Member Button -->
-    <div class="container mt-4">
+    <div class="container mt-4" id="addbtn" style="display: none;">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">
             Add Member
         </button>
@@ -46,7 +53,7 @@
 
 
     <!-- Container to display members' data -->
-    <div class="container mt-4">
+    <div class="container mt-4" id="tableHead" style="display: none;">
         <table class="table" id="membersTable">
             <thead class="thead-dark">
                 <!-- Table header with column names -->
@@ -109,6 +116,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
+
+                
+
+
         // Function to display user data in the membersTable
         function displayUserData(users) {
             var membersTable = document.getElementById("membersTable");
@@ -230,6 +241,10 @@
 
         // Event listener for the "Members" link
         document.getElementById("membersLink").addEventListener("click", function () {
+            var addbtn = document.getElementById("addbtn");
+            var tableHead = document.getElementById("tableHead");
+            addbtn.style.display = 'block';
+            tableHead.style.display = 'block';
             // Fetch members' data from the server using AJAX
             fetchMemberData();
         });
