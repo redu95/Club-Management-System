@@ -8,10 +8,29 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Add this CSS in your <head> section for styling the event cards -->
+    <!-- Add this CSS in your <head> section for styling the event cards -->
+    <style>
+        .event-card {
+            width: 70%;
+            margin: 20px auto;
+        }
+    
+        .event-image {
+            max-height: 300px;
+            /* Set a maximum height for the event image */
+            object-fit: cover;
+            /* Ensure the image covers the container */
+        }
+    </style>
 </head>
 
 
@@ -30,9 +49,8 @@
                 <li class="nav-item active">
                     <a class="nav-link" id="membersLink" href="#">Members List </a>
                 </li>
-                
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Reports</a>
+                    <a class="nav-link" href="#" id="reportsLink">Reports</a>
                 </li>
             </ul>
         </div>
@@ -78,7 +96,6 @@
                 </div>
             </div>
         </div>
-        </div>
 
         <div class="row" id="post" style="display: none;">
             <div class="col-md-6">
@@ -93,7 +110,7 @@
         </div>
     </div>
 
-<!---Memeber List Div--->
+    <!---Memeber List Div--->
     <!-- Add Member Button -->
     <div class="container mt-4" id="addbtn" style="display: none;">
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">
@@ -112,6 +129,7 @@
                     <th>User Name</th>
                     <th>Sex</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -158,7 +176,35 @@
             </div>
         </div>
     </div>
-<!------------------------------------------------------------------------------------>
+    <!------------------------------------------------------------------------------------>
+
+    <!-- Reports Div -->
+    <div class="container mt-5" id="reports" style="display: none;">
+        <!-- User Sex Report -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>User Sex Report</h3>
+                <canvas id="userSexChart"></canvas>
+            </div>
+        </div>
+
+        <!-- User Role Report -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>User Role Report</h3>
+                <canvas id="userRoleChart"></canvas>
+            </div>
+        </div>
+
+        <!-- User Status Report -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>User Status Report</h3>
+                <canvas id="userStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <!------------------------------------------------------------------------------------>
 
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
@@ -184,9 +230,11 @@
                 row.insertCell(1).textContent = user.user_name;
                 row.insertCell(2).textContent = user.user_sex;
                 row.insertCell(3).textContent = user.user_role;
+                row.insertCell(4).textContent = user.user_status;
+
 
                 // New cell for buttons
-                var actionCell = row.insertCell(4);
+                var actionCell = row.insertCell(5);
 
                 // Add buttons for each row
                 var editButton = document.createElement("button");
@@ -369,34 +417,35 @@
             });
 
             // Function to display events on the page
-            function displayEvents(events) {
-                var post = document.getElementById("post");
-                var eventContainer = document.createElement("div");
+                function displayEvents(events) {
+                    var post = document.getElementById("post");
+                    var eventContainer = document.createElement("div");
 
-                // Clear previous content
-                post.innerHTML = "";
+                    // Clear previous content
+                    post.innerHTML = "";
 
-                // Display each event
-                events.forEach(function (event) {
-                    var eventDiv = document.createElement("div");
-                    eventDiv.className = "row";
-                    eventDiv.innerHTML = `
-            <div class="col-md-6">
-                <h2>${event.event_title}</h2>
-                <img src="${event.event_image}" class="img-fluid" alt="Event Image">
-            </div>
-            <div class="col-md-6">
-                <p>${event.event_description}</p>
-            </div>
-        `;
+                    // Display each event in a Bootstrap card
+                    events.forEach(function (event) {
+                        var eventCard = document.createElement("div");
+                        eventCard.className = "card event-card";
+                        eventCard.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">${event.event_title}</h5>
+                </div>
+                <img src="/assets/images/computer_science_and_engineering_club_cover.jpeg" class="card-img-top event-image" alt="Event Image">
 
-                    // Append the eventDiv to the eventContainer
-                    eventContainer.appendChild(eventDiv);
-                });
+                <div class="card-body">
+                    <p class="card-text">${event.event_description}</p>
+                </div>
+            `;
 
-                // Append the eventContainer to the post
-                post.appendChild(eventContainer);
-            }
+                        // Append the eventCard to the eventContainer
+                        eventContainer.appendChild(eventCard);
+                    });
+
+                    // Append the eventContainer to the post
+                    post.appendChild(eventContainer);
+                }
 
         
         document.getElementById('addEventForm').addEventListener('submit', function (event) {
@@ -423,6 +472,40 @@
             });
 
         //==========================================
+
+        //===================Reports===================
+
+        document.getElementById("reportsLink").addEventListener("click", function () {
+                console.log("Reports link clicked");
+                fetchReports(); // Ensure fetchReports function is correctly defined
+            });
+
+            // Add the fetchReports function
+            function fetchReports() {
+                // Fetch reports from the server using AJAX
+                fetch('/admin/reports')
+                    .then(response => response.json())
+                    .then(reports => {
+                        // Log the fetched reports to the console
+                        console.log('Fetched reports:', reports);
+
+                        // Process the reports data as needed
+                        displayReports(reports);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching reports:', error);
+                        // Handle errors as needed
+                    });
+            }
+
+            // Add the displayReports function
+            function displayReports(reports) {
+                // Log the reports data to the console
+                console.log('Displaying reports:', reports);
+
+                // Implement your code to display reports on the page using colored bargraphs
+            }
+        //===============================================
 
     </script>
 </body>

@@ -372,6 +372,15 @@ app.get("/api/events2", function (req, res) {
             res.status(500).send("Internal Server Error");
             return;
         }
+        // Update the image paths to include the correct URL prefix
+        const eventsWithRelativePaths = results.map(event => {
+            return {
+                ...event,
+                event_image: `/assets/images/${event.event_image}`
+            };
+        });
+
+        res.json(eventsWithRelativePaths);
 
         // Respond with the fetched events in JSON format
         res.json(results);
@@ -402,6 +411,29 @@ app.post("/api/events", function (req, res) {
 
 
 //=======================================================================
+
+//=====================Report Things===============================
+
+// Handle GET requests for reports
+app.get("/admin/reports", function (req, res) {
+    // Fetch counts for different categories (sex, role, status)
+    connection.query("SELECT user_sex, user_role, user_status, COUNT(*) as count FROM loginuser GROUP BY user_sex, user_role, user_status", function (error, results, fields) {
+        if (error) {
+            console.log("ERRor in database");
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Respond with the fetched data in JSON format
+        res.json(results);
+        console.log("Working")
+    });
+});
+
+
+
+//================================================================
 
 // Set the app port
 const PORT = 3200;
