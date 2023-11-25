@@ -12,31 +12,29 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Member Area</a>
+        <a class="navbar-brand" href="#">CSEC ASTU</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="homeLink">Home</a>
                 </li>
-                <li class="nav-item dropdown">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#" id="eventsLink">Events</a>
+                </li>
+
+                <li class="nav-item dropdown ml-auto">
                     <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         My Profile
                     </a>
                     <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                        <a class="dropdown-item" href="#" id="viewProfileLink">View Profile</a>
                         <a class="dropdown-item" href="#" id="editProfileLink">Edit Profile</a>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventsLink">Events</a>
-                    <div class="dropdown-menu" id="eventsDropdown" aria-labelledby="eventsLink">
-                        <a class="dropdown-item" href="#">Upcoming Events</a>
-                        <a class="dropdown-item" href="#">Past Events</a>
                     </div>
                 </li>
             </ul>
@@ -47,23 +45,43 @@
         <!-- Content will be dynamically loaded here based on menu selection -->
     </div>
 
+
+    <!---Modal for edit password-->
+    <div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPasswordModalLabel">Edit Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for changing password -->
+                    <form id="editPasswordForm">
+                        <div class="form-group">
+                            <label for="oldPassword">Old Password</label>
+                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-        // Function to set user data in session storage during login
-        function setUserData(name, password) {
-            sessionStorage.setItem('userData', JSON.stringify({ name: name, password: password }));
-        }
-
-        // Function to get user data from session storage
-        function getUserData() {
-            var userDataString = sessionStorage.getItem('userData');
-            return userDataString ? JSON.parse(userDataString) : null;
-        }
-
         // Display the content for the selected menu
         function showContent(content) {
             document.getElementById("variablePage").innerHTML = content;
@@ -77,94 +95,34 @@
             showContent("<img src='assets/images/computer_science_and_engineering_club_cover.jpeg' alt='Welcome Image'><h2>Welcome to CSEC ASTU Club Management</h2>");
         });
 
-        document.getElementById("viewProfileLink").addEventListener("click", function () {
-            // Get user data from session storage
-            var userData = getUserData();
-
-            // Display user data in the profile view
-            if (userData) {
-                showContent("<h2>Member Profile</h2><p>Name: " + userData.name + "</p><p>Password: " + userData.password + "</p>");
-            } else {
-                showContent("<p>User data not available.</p>");
-            }
-        });
-
-        document.getElementById("editProfileLink").addEventListener("click", function () {
-            // Display the edit profile modal
-            showEditProfileModal();
-        });
-
+        //=========================Event Area=========================
         document.getElementById("eventsLink").addEventListener("click", function () {
             // Add your events content here
             showContent("<h2>Events</h2><p>Upcoming Events...</p>");
         });
+        //=============================================================
 
-        // Function to display the edit profile modal
-        function showEditProfileModal() {
-            // Get user data from session storage
-            var userData = getUserData();
+        //==================Edit password area==================================
+        // Add event listener for "Edit Profile" link
+            document.getElementById("editProfileLink").addEventListener("click", function () {
+                // Show the "Edit Password" modal
+                $('#editPasswordModal').modal('show');
+            });
 
-            // Check if user data is available
-            if (userData) {
-                // Edit Profile Modal Content
-                var modalContent = `
-                    <div class="modal" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="editProfileForm">
-                                        <div class="form-group">
-                                            <label for="editName">Name</label>
-                                            <input type="text" class="form-control" id="editName" value="${userData.name}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="editPassword">Password</label>
-                                            <input type="password" class="form-control" id="editPassword" value="${userData.password}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="editEmail">Email</label>
-                                            <input type="email" class="form-control" id="editEmail" placeholder="Enter your email">
-                                        </div>
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+           // Add event listener for the "Edit Password" form
+            document.getElementById("editPasswordForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                // Extract old password and new password from the form
+                const oldPassword = document.getElementById("oldPassword").value;
+                const newPassword = document.getElementById("newPassword").value;
 
-                // Display the modal content
-                showContent(modalContent);
+                // Update the password by submitting the form directly
+                document.getElementById("editPasswordForm").action = "/change-password";
+                document.getElementById("editPasswordForm").method = "POST";
+                document.getElementById("editPasswordForm").submit();
+            });
 
-                // Attach event listener for form submission
-                document.getElementById("editProfileForm").addEventListener("submit", function (event) {
-                    event.preventDefault();
-
-                    // Get updated values
-                    var newName = document.getElementById("editName").value;
-                    var newPassword = document.getElementById("editPassword").value;
-                    var newEmail = document.getElementById("editEmail").value;
-
-                    // Update user data in session storage
-                    setUserData(newName, newPassword);
-
-                    // Display success message (you can replace this with your logic for saving to the server)
-                    alert("Profile updated successfully!");
-                });
-
-                // Show the modal
-                $('#editProfileModal').modal('show');
-            } else {
-                alert("User data not available.");
-            }
-        }
+        //=============================================================
     </script>
 </body>
 

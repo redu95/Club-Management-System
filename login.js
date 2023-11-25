@@ -3,10 +3,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const encoder = bodyParser.urlencoded();
 const session = require("express-session");
-
+const cors = require("cors");
 const app = express();
+const bcrypt = require('bcrypt');
+
 app.use("/assets", express.static("assets"));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors())
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -48,6 +51,22 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+
+
+// Middleware to check if the user is authenticated
+const authenticateUser = (req, res, next) => {
+    if (req.session && req.session.user) {
+        // User is authenticated, proceed to the next middleware or route
+        return next();
+    } else {
+        // User is not authenticated, redirect to the login page
+        res.redirect("/");
+    }
+};
+
+// Apply the middleware to routes that require authentication
+app.use("/admin", authenticateUser);
+app.use("/member", authenticateUser);
 
 
 // Handle POST requests for login
@@ -97,21 +116,6 @@ app.get("/admin/members", function (req, res) {
 });
 
 //-----------------------------
-// Middleware to check if the user is authenticated
-const authenticateUser = (req, res, next) => {
-    if (req.session && req.session.user) {
-        // User is authenticated, proceed to the next middleware or route
-        return next();
-    } else {
-        // User is not authenticated, redirect to the login page
-        res.redirect("/");
-    }
-};
-
-// Apply the middleware to routes that require authentication
-app.use("/admin", authenticateUser);
-app.use("/member", authenticateUser);
-
 
 // Handle GET requests for the admin dashboard
 app.get("/admin", function (req, res) {
@@ -145,20 +149,85 @@ app.get("/member", function (req, res) {
 
             // Check if user data is found
             if (results.length > 0) {
-                // Render the member.html page with the fetched data
-                res.render(__dirname + "/member.html", { user: results[0] });
+                // Return the user data as JSON
+                res.json(results[0]);
             } else {
-                res.status(404).send("User not found");
+                res.status(404).json({ error: 'User not found' });
             }
         });
     } else {
-        res.redirect("/");
+        res.status(401).json({ error: 'Unauthorized' });
     }
 });
 
 
+//==========================   ==================
+
+// Handle POST requests for changing password
+app.post('/change-password', encoder, (req, res) => {
+    const userId = req.session.user.id; // Retrieve user ID from the session
+    const { oldPassword, newPassword } = req.body;
+
+    // Perform your database update logic here
+    connection.query(
+        'UPDATE loginuser SET user_pass = ? WHERE user_id = ? AND user_pass = ?',
+        [bcrypt.hashSync(newPassword, 10), userId, oldPassword],
+        (error, results) => {
+            if (error) {
+                console.error('Password update error:', error);
+                res.status(500).send('Internal Server Error');
+            } else if (results.affectedRows > 0) {
+                res.send('Password changed successfully');
+            } else {
+                res.status(401).send('Old password is incorrect');
+            }
+        }
+    );
+});
+
+
+//=================================================
+
+// Handle POST requests for login
+app.post("/", encoder, function (req, res) {
+    var username = req.body.username;
+    var password = req.body.password;
+
+    connection.query(
+        "SELECT * FROM loginuser WHERE user_name = ? AND user_pass = ?",
+        [username, password],
+        function (error, results, fields) {
+            if (results.length > 0) {
+                // Set session upon successful login
+                req.session.user = {
+                    id: results[0].user_id,  // Store user ID in the session
+                    username: results[0].user_name,
+                    role: results[0].user_role,
+                };
+
+                // Redirect based on user role
+                if (results[0].user_role === "admin") {
+                    res.redirect("/admin");
+                } else if (results[0].user_role === "member") {
+                    res.redirect("/member");
+                } else {
+                    res.redirect("/");
+                }
+            } else {
+                res.redirect("/");
+            }
+        }
+    );
+});
+
+
+//===================================================================
+
+//=========================== //======================
+
+
 // Set the app port
-const PORT = 3600;
+const PORT = 3200;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
