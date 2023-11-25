@@ -42,7 +42,7 @@
     <div class="container mt-5">
 
         <!-- Add New Post Button -->
-        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal">
+        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal" id="NewPostBtn" style="display: none;">
             Add New Post
         </button>
         
@@ -80,15 +80,15 @@
         </div>
         </div>
 
-        <div class="row">
+        <div class="row" id="post" style="display: none;">
             <div class="col-md-6">
                 <!-- Event Image -->
+                <h2 id="eventTitle">Event Titile</h2>
                 <img id="eventImage" class="img-fluid" alt="Event Image">
             </div>
             <div class="col-md-6">
                 <!-- Event Description -->
-                <h2 id="eventTitle"></h2>
-                <p id="eventDescription"></p>
+                <p id="eventDescription">Event Description</p>
             </div>
         </div>
     </div>
@@ -348,6 +348,12 @@
         //=====================================================
 
         //===================Event Things=============
+        document.getElementById("homeLink").addEventListener("click", function () {
+            var NewPostBtn =document.getElementById("NewPostBtn");
+            var post = document.getElementById("post");
+            NewPostBtn.style.display = 'block';
+            post.style.display = 'block';
+        });
         
         document.getElementById('addEventForm').addEventListener('submit', function (event) {
                 event.preventDefault();
