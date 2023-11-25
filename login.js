@@ -163,27 +163,59 @@ app.get("/member", function (req, res) {
 
 //==========================   ==================
 
+
 // Handle POST requests for changing password
 app.post('/change-password', encoder, (req, res) => {
     const userId = req.session.user.id; // Retrieve user ID from the session
     const { oldPassword, newPassword } = req.body;
 
-    // Perform your database update logic here
+    // Fetch the user's current hashed password from the database
     connection.query(
-        'UPDATE loginuser SET user_pass = ? WHERE user_id = ? AND user_pass = ?',
-        [bcrypt.hashSync(newPassword, 10), userId, oldPassword],
+        'SELECT user_pass FROM loginuser WHERE user_id = ?',
+        [userId],
         (error, results) => {
             if (error) {
-                console.error('Password update error:', error);
+                console.error('Database error:', error);
                 res.status(500).send('Internal Server Error');
-            } else if (results.affectedRows > 0) {
-                res.send('Password changed successfully');
+                return;
+            }
+
+            if (results.length > 0) {
+                const storedHashedPassword = results[0].user_pass;
+
+                // Verify the old password against the stored hashed password
+                if (bcrypt.compareSync(oldPassword, storedHashedPassword)) {
+                    // Old password is correct, proceed with the update
+                    connection.query(
+                        'UPDATE loginuser SET user_pass = ? WHERE user_id = ?',
+                        [bcrypt.hashSync(newPassword, 10), userId],
+                        (updateError, updateResults) => {
+                            if (updateError) {
+                                console.error('Password update error:', updateError);
+                                res.status(500).send('Internal Server Error');
+                            } else if (updateResults.affectedRows > 0) {
+                                res.send('Password changed successfully');
+                                console.log('Password changed successfully')
+                            } else {
+                                res.status(500).send('Failed to update password');
+                                console.log('Failed to update password')
+                            }
+                        }
+                    );
+                } else {
+                    // Old password is incorrect
+                    res.status(401).send('Old password is incorrect');
+                    console.log('Old password is incorrect')
+                }
             } else {
-                res.status(401).send('Old password is incorrect');
+                // User not found
+                res.status(404).send('User not found');
             }
         }
     );
 });
+
+
 
 
 //=================================================

@@ -109,18 +109,40 @@
                 $('#editPasswordModal').modal('show');
             });
 
-           // Add event listener for the "Edit Password" form
-            document.getElementById("editPasswordForm").addEventListener("submit", function (event) {
-                event.preventDefault();
+           // Function to change the password
+            function changePassword() {
                 // Extract old password and new password from the form
                 const oldPassword = document.getElementById("oldPassword").value;
                 const newPassword = document.getElementById("newPassword").value;
 
-                // Update the password by submitting the form directly
-                document.getElementById("editPasswordForm").action = "/change-password";
-                document.getElementById("editPasswordForm").method = "POST";
-                document.getElementById("editPasswordForm").submit();
-            });
+                // Call the function to make the HTTP POST request
+                changePasswordRequest(oldPassword, newPassword);
+            }
+
+            // Function to make the HTTP POST request
+            function changePasswordRequest(oldPassword, newPassword) {
+                // Create FormData object and append data
+                const formData = new FormData();
+                formData.append('oldPassword', oldPassword);
+                formData.append('newPassword', newPassword);
+
+                // Make the HTTP POST request using fetch
+                fetch('/change-password', {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        // Handle the response, e.g., show a success message
+                        console.log(data);
+                        // Optionally, you can close the modal
+                        $('#editPasswordModal').modal('hide');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Handle the error, e.g., show an error message
+                    });
+            }
 
         //=============================================================
     </script>
