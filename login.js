@@ -360,6 +360,33 @@ app.put("/admin/edit-user/:userId/:newRole", function (req, res) {
 
 //========================================================================
 
+
+//========================Event Things===================================
+
+// Handle POST requests for creating events
+app.post("/api/events", function (req, res) {
+    const { event_title, event_image, event_description } = req.body;
+
+    // Add the new event to the events table
+    connection.query(
+        "INSERT INTO events (event_title, event_image, event_description) VALUES (?, ?, ?)",
+        [event_title, event_image, event_description],
+        function (error, results, fields) {
+            if (error) {
+                console.error("Error adding a new event:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Respond with a success message
+            res.send("New event added successfully");
+        }
+    );
+});
+
+
+//=======================================================================
+
 // Set the app port
 const PORT = 3200;
 app.listen(PORT, () => {
