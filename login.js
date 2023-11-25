@@ -363,6 +363,22 @@ app.put("/admin/edit-user/:userId/:newRole", function (req, res) {
 
 //========================Event Things===================================
 
+// Handle GET requests for fetching events
+app.get("/api/events2", function (req, res) {
+    // Fetch events from the events table in descending order of event_id (assuming event_id is an auto-incrementing primary key)
+    connection.query("SELECT * FROM events ORDER BY event_id DESC", function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        // Respond with the fetched events in JSON format
+        res.json(results);
+    });
+});
+
+
 // Handle POST requests for creating events
 app.post("/api/events", function (req, res) {
     const { event_title, event_image, event_description } = req.body;

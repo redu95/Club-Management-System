@@ -348,12 +348,56 @@
         //=====================================================
 
         //===================Event Things=============
-        document.getElementById("homeLink").addEventListener("click", function () {
-            var NewPostBtn =document.getElementById("NewPostBtn");
-            var post = document.getElementById("post");
-            NewPostBtn.style.display = 'block';
-            post.style.display = 'block';
-        });
+        // Event listener for the "Home" link
+            document.getElementById("homeLink").addEventListener("click", function () {
+                var NewPostBtn = document.getElementById("NewPostBtn");
+                var post = document.getElementById("post");
+                NewPostBtn.style.display = 'block';
+                post.style.display = 'block';
+
+                // Fetch events from the server using AJAX
+                fetch('/api/events2')
+                    .then(response => response.json())
+                    .then(events => {
+                        // Display events on the page
+                        displayEvents(events);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching events:', error);
+                        // Handle errors as needed
+                    });
+            });
+
+            // Function to display events on the page
+            function displayEvents(events) {
+                var post = document.getElementById("post");
+                var eventContainer = document.createElement("div");
+
+                // Clear previous content
+                post.innerHTML = "";
+
+                // Display each event
+                events.forEach(function (event) {
+                    var eventDiv = document.createElement("div");
+                    eventDiv.className = "row";
+                    eventDiv.innerHTML = `
+            <div class="col-md-6">
+                <h2>${event.event_title}</h2>
+                <img src="${event.event_image}" class="img-fluid" alt="Event Image">
+            </div>
+            <div class="col-md-6">
+                <p>${event.event_description}</p>
+            </div>
+        `;
+
+                    // Append the eventDiv to the eventContainer
+                    eventContainer.appendChild(eventDiv);
+                });
+
+                // Append the eventContainer to the post
+                post.appendChild(eventContainer);
+            }
+
         
         document.getElementById('addEventForm').addEventListener('submit', function (event) {
                 event.preventDefault();
