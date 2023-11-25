@@ -333,6 +333,32 @@ app.delete("/admin/delete-user/:userId/confirm", function (req, res) {
 
 //========================================================================
 
+//================== Edit member role================================
+
+app.put("/admin/edit-user/:userId/:newRole", function (req, res) {
+    const userId = req.params.userId;
+    const newRole = req.params.newRole;
+
+    // Update the user's role in the database
+    connection.query(
+        "UPDATE loginuser SET user_role = ? WHERE user_id = ?",
+        [newRole, userId],
+        function (error, results, fields) {
+            if (error) {
+                console.error("Error updating user role:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Respond with a success message
+            res.send("User role updated successfully");
+            console.log("User role updated successfully");
+        }
+    );
+});
+
+
+//========================================================================
 
 // Set the app port
 const PORT = 3200;
