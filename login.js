@@ -5,7 +5,8 @@ const encoder = bodyParser.urlencoded();
 const session = require("express-session");
 const cors = require("cors");
 const app = express();
-const bcrypt = require('bcrypt');
+const fs = require('fs');
+//const bcrypt = require('bcrypt');
 
 app.use("/assets", express.static("assets"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -37,7 +38,6 @@ connection.connect(function (error) {
 
 // Define a route to handle GET requests for the admin dashboard
 app.get("/admin", function (req, res) {
-    // Add admin-specific functionalities like member management, event management, reporting
 
     // Fetch data from the loginuser table
     connection.query("SELECT * FROM loginuser", function (error, results, fields) {
@@ -81,6 +81,7 @@ app.use("/member", authenticateUser);
 app.post("/", encoder, function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
+    
 
     connection.query(
         "SELECT * FROM loginuser WHERE user_name = ? AND user_pass = ?",
@@ -170,11 +171,40 @@ app.get("/member", function (req, res) {
 });
 
 
-//==========================   ==================
+//========================== Edit profile  ==================
+// Handle POST requests for editing profile information
+
+app.post("/api/editProfile", authenticateUser, function (req, res) {
+    const userId = req.session.user && req.session.user.id;
+    const newUsername = req.body.newUsername;
+    const newUserSex = req.body.newUserSex;
+
+    if (userId) {
+        connection.query(
+            "UPDATE loginuser SET user_name = ?, user_sex = ? WHERE user_id = ?",
+            [newUsername, newUserSex, userId],
+            function (error, results, fields) {
+                if (error) {
+                    console.error("Error updating profile information:", error);
+                    res.status(500).send("Internal Server Error");
+                    return;
+                }
+
+                // Respond with a success message
+                res.send("Profile information updated successfully");
+            }
+        );
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
 
 
+
+
+//=====================================================================CHANGE++++++++=============================
 // Handle POST requests for changing password
-app.post('/change-password', encoder, (req, res) => {
+app.post('/api/changePassword', encoder, (req, res) => {
     const userId = req.session.user.id; // Retrieve user ID from the session
     const { oldPassword, newPassword } = req.body;
 
@@ -190,14 +220,15 @@ app.post('/change-password', encoder, (req, res) => {
             }
 
             if (results.length > 0) {
-                const storedHashedPassword = results[0].user_pass;
+                
 
-                // Verify the old password against the stored hashed password
-                if (bcrypt.compareSync(oldPassword, storedHashedPassword)) {
-                    // Old password is correct, proceed with the update
+                // Log relevant information for debugging
+                console.log('Old Password:', oldPassword);
+
+
                     connection.query(
                         'UPDATE loginuser SET user_pass = ? WHERE user_id = ?',
-                        [bcrypt.hashSync(newPassword, 10), userId],
+                        [newPassword, userId],
                         (updateError, updateResults) => {
                             if (updateError) {
                                 console.error('Password update error:', updateError);
@@ -205,19 +236,14 @@ app.post('/change-password', encoder, (req, res) => {
                             } else if (updateResults.affectedRows > 0) {
                                 res.send('Password changed successfully');
                                 console.log('Password changed successfully')
+                                console.log(newPassword)
                             } else {
                                 res.status(500).send('Failed to update password');
                                 console.log('Failed to update password')
                             }
                         }
                     );
-                } else {
-                    // Old password is incorrect
-                    res.status(401).send('Old password is incorrect');
-                    console.log('Old password is incorrect')
-                }
             } else {
-                // User not found
                 res.status(404).send('User not found');
             }
         }
@@ -276,7 +302,7 @@ app.post("/admin/add-user", encoder, function (req, res) {
     var newUserRole = req.body.user_role;
     var newUserSex = req.body.user_sex; // New line
 
-    console.log("User Sex:", newUserSex);
+    
 
     // Add the new user to the loginuser table
     connection.query(
@@ -382,9 +408,10 @@ app.get("/api/events3", function (req, res) {
         }
         // Update the image paths to include the correct URL prefix
         const eventsWithRelativePaths = results.map(event => {
+            const base64Image = event.event_image.toString('base64');
             return {
                 ...event,
-                event_image: `/assets/images/${event.event_image}`
+                event_image: base64Image,
             };
         });
 
@@ -406,9 +433,10 @@ app.get("/api/events2", function (req, res) {
         }
         // Update the image paths to include the correct URL prefix
         const eventsWithRelativePaths = results.map(event => {
+            const base64Image = event.event_image.toString('base64');
             return {
                 ...event,
-                event_image: `/assets/images/${event.event_image}`
+                event_image: base64Image,
             };
         });
 
@@ -420,11 +448,15 @@ app.get("/api/events2", function (req, res) {
 // Handle POST requests for creating events
 app.post("/api/events", function (req, res) {
     const { event_title, event_image, event_description } = req.body;
+    console.log('Received image data:', event_image);
+    // Convert base64-encoded image to buffer
+    const imageBuffer = Buffer.from(event_image, 'base64');
 
+   
     // Add the new event to the events table
     connection.query(
         "INSERT INTO events (event_title, event_image, event_description) VALUES (?, ?, ?)",
-        [event_title, event_image, event_description],
+        [event_title, imageBuffer, event_description],
         function (error, results, fields) {
             if (error) {
                 console.error("Error adding a new event:", error);
@@ -433,7 +465,7 @@ app.post("/api/events", function (req, res) {
             }
 
             // Respond with a success message
-            res.send("New event added successfully");
+            console.log("New event added successfully");
         }
     );
 });
@@ -494,7 +526,7 @@ app.get("/api/profileInfo", authenticateUser, function (req, res) {
 //================================================================
 
 // Set the app port
-const PORT = 3900;
+const PORT = 3400;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

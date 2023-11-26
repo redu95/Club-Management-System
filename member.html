@@ -43,8 +43,68 @@
         </div>
     </nav>
 
-    <div class="container mt-4" id="variablePage">RED
+    <div class="container mt-4" id="variablePage">
         <!-- Content will be dynamically loaded here based on menu selection -->
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProfileForm">
+                        <div class="form-group">
+                            <label for="editUsername">Username</label>
+                            <input type="text" class="form-control" id="editUsername" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserSex">Sex</label>
+                            <select class="form-control" id="editUserSex" required>
+                                <option value="Male">M</option>
+                                <option value="Female">F</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="saveChangesEditProfile">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="oldPassword">Old Password</label>
+                            <input type="password" class="form-control" id="oldPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="saveChangesChangePassword">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row" id="post" style="display: none;">
@@ -76,9 +136,6 @@
             </div>
         </div>
     </div>
-
-
-    
 
 
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
@@ -140,7 +197,7 @@
                 <div class="card-body">
                     <h5 class="card-title">${event.event_title}</h5>
                 </div>
-                <img src="/assets/images/computer_science_and_engineering_club_logo.jpeg" class="card-img-top event-image" alt="Event Image">
+                <img src="data:image/jpeg;base64,${event.event_image}" alt="Event Image">
 
                 <div class="card-body">
                     <p class="card-text">${event.event_description}</p>
@@ -181,65 +238,96 @@
                 document.getElementById("userStatus").innerText = 'Status: ' + profileInfo.user_status;
             }
 
-        //=============================================================
+        //==========================Edit Profile===================================
 
-        //==================Edit password area==================================
-        // Add event listener for "Edit Profile" link
-            document.getElementById("editProfileLink").addEventListener("click", function () {
-                // Show the "Edit Password" modal
-                $('#editPasswordModal').modal('show');
-            });
 
-           // Function to change the password
-            function changePassword() {
-                // Extract old password and new password from the form
-                const oldPassword = document.getElementById("oldPassword").value;
-                const newPassword = document.getElementById("newPassword").value;
-
-                // Call the function to make the HTTP POST request
-                changePasswordRequest(oldPassword, newPassword);
-            }
-
-            // Function to make the HTTP POST request
-            function changePasswordRequest(oldPassword, newPassword) {
-                // Create FormData object and append data
-                const formData = new FormData();
-                formData.append('oldPassword', oldPassword);
-                formData.append('newPassword', newPassword);
-
-                // Make the HTTP POST request using fetch
-                fetch('/change-password', {
-                    method: 'POST',
-                    body: formData,
-                })
-                    .then(response => response.text())
-                    .then(data => {
-                        // Handle the response, e.g., show a success message
-                        console.log(data);
-                        // Optionally, you can close the modal
-                        $('#editPasswordModal').modal('hide');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Handle the error, e.g., show an error message
-                    });
-            }
-
-            // Example client-side code
-                fetch('http://localhost:3200/api/profileInfo')
+        // Event listener for "Edit Profile" link
+            document.getElementById("editProfileBtn").addEventListener("click", function () {
+                // Fetch profile information from the server using AJAX
+                fetch('/api/profileInfo', { credentials: 'include' })
                     .then(response => response.json())
-                    .then(data => {
-                        console.log(data); // Log the retrieved data
-                        // Handle the retrieved data as needed
+                    .then(profileInfo => {
+                        // Populate the modal with current profile information
+                        document.getElementById("editUsername").value = profileInfo.user_name;
+                        document.getElementById("editUserSex").value = profileInfo.user_sex;
+
+                        // Show the "Edit Profile" modal
+                        $('#editProfileModal').modal('show');
                     })
                     .catch(error => {
                         console.error('Error fetching profile information:', error);
                         // Handle errors as needed
                     });
-                
+            });
 
+            document.getElementById("saveChangesEditProfile").addEventListener("click", function () {
+                    // Extract updated username and usersex from the form
+                    const newUsername = document.getElementById("editUsername").value;
+                    const newUserSex = document.getElementById("editUserSex").value;
 
+                    // Make the HTTP POST request to update profile information
+                    fetch('/api/editProfile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            newUsername,
+                            newUserSex,
+                        }),
+                        credentials: 'include', // Include credentials for session
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            console.log(data); // Log the response
+                            // Optionally, you can close the modal
+                            $('#editProfileModal').modal('hide');
+                            // Reload the page or update the displayed information as needed
+                        })
+                        .catch(error => {
+                            console.error('Error updating profile information:', error);
+                            // Handle errors as needed
+                        });
+                });
 
+            //==================Change password area==================================
+            // Event listener for the "Change Password" link
+                document.getElementById("changePasswordBtn").addEventListener("click", function () {
+                    // Show the "Change Password" modal
+                    $('#changePasswordModal').modal('show');
+                });
+
+                // Updated event listener for the "Save Changes" button in the "Change Password" modal
+                    document.getElementById("saveChangesChangePassword").addEventListener("click", function () {
+                        // Extract old password and new password from the form
+                        const oldPassword = document.getElementById("oldPassword").value;
+                        const newPassword = document.getElementById("newPassword").value;
+
+                        // Make the HTTP POST request to change the password
+                        fetch('/api/changePassword', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                oldPassword,
+                                newPassword,
+                            }),
+                            credentials: 'include', // Include credentials for session
+                        })
+                            .then(response => response.text())
+                            .then(data => {
+                                console.log(data); // Log the response
+                                // Optionally, you can close the modal
+                                $('#changePasswordModal').modal('hide');
+
+                                // Reload the page or update the displayed information as needed
+                            })
+                            .catch(error => {
+                                console.error('Error changing password:', error);
+                                // Handle errors as needed
+                            });
+                    });
         //=============================================================
     </script>
 </body>
