@@ -12,6 +12,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
 app.use(express.json()); // Add this line to parse JSON data
 
+// Add session middleware
+app.use(session({
+    secret: "your-secret-key",
+    resave: false,
+    saveUninitialized: true,
+}));
+
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -82,6 +89,7 @@ app.post("/", encoder, function (req, res) {
             if (results.length > 0) {
                 // Set session upon successful login
                 req.session.user = {
+                    id: results[0].user_id,
                     username: results[0].user_name,
                     role: results[0].user_role,
                 };
@@ -223,6 +231,7 @@ app.post('/change-password', encoder, (req, res) => {
 
 // Handle POST requests for login
 app.post("/", encoder, function (req, res) {
+    req.session = req.session || {};
     var username = req.body.username;
     var password = req.body.password;
 
@@ -237,6 +246,8 @@ app.post("/", encoder, function (req, res) {
                     username: results[0].user_name,
                     role: results[0].user_role,
                 };
+
+                 console.log("Session user:", req.session.user); // Log the session user data
 
                 // Redirect based on user role
                 if (results[0].user_role === "admin") {
@@ -449,12 +460,41 @@ app.get("/admin/reports", function (req, res) {
     });
 });
 
+//================================================================
+//========================MY PROFILE=============================
+
+// Handle GET requests for the user's profile information
+app.get("/api/profileInfo", authenticateUser, function (req, res) {
+    console.log("Session user in /api/profileInfo:", req.session.user);
+    const userId = req.session.user && req.session.user.id;
+    console.log("User ID:", userId); // Log the user ID
+    // Fetch user profile data based on the user ID
+    if (userId) {
+        connection.query("SELECT * FROM loginuser WHERE user_id = ?", [userId], function (error, results, fields) {
+            if (error) {
+                console.error("Database query error:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Check if user data is found
+            if (results.length > 0) {
+                // Return the user data as JSON
+                res.json(results[0]);
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        });
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
 
 
 //================================================================
 
 // Set the app port
-const PORT = 3200;
+const PORT = 3900;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

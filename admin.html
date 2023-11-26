@@ -50,7 +50,7 @@
                     <a class="nav-link" id="membersLink" href="#">Members List </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="reportsLink">Reports</a>
+                    <a class="nav-link" href="#" id="reportsLink">ReportsPP</a>
                 </li>
             </ul>
         </div>
@@ -179,7 +179,7 @@
     <!------------------------------------------------------------------------------------>
 
     <!-- Reports Div -->
-    <div class="container mt-5" id="reports" style="display: none;">
+    <div class="container mt-5" id="reports" style="display:none;">
         <!-- User Sex Report -->
         <div class="row mt-4">
             <div class="col-md-6">
@@ -401,7 +401,6 @@
         //===================Event Things=============
         // Event listener for the "Home" link
             document.getElementById("homeLink").addEventListener("click", function () {
-                //window.location.reload();
                 var NewPostBtn = document.getElementById("NewPostBtn");
                 var post = document.getElementById("post");
                 NewPostBtn.style.display = 'block';
@@ -479,37 +478,132 @@
 
         //===================Reports===================
 
-        document.getElementById("reportsLink").addEventListener("click", function () {
-                window.location.reload();
-                console.log("Reports link clicked");
-                fetchReports(); // Ensure fetchReports function is correctly defined
-        });
+        // Function to display reports using colored bar graphs
+            function displayReports(userData) {
+                // User Sex Chart
+                var userSexCtx = document.getElementById('userSexChart').getContext('2d');
+                var userSexChart = new Chart(userSexCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Female', 'Male'],
+                        datasets: [{
+                            label: 'User Sex',
+                            data: [
+                                userData.filter(user => user.user_sex === 'F').length,
+                                userData.filter(user => user.user_sex === 'M').length
+                            ],
+                            backgroundColor: ['#FF6384', '#36A2EB']
+                        }]
+                    }
+                });
 
-            // Add the fetchReports function
-            function fetchReports() {
-                // Fetch reports from the server using AJAX
-                fetch('/admin/reports')
-                    .then(response => response.json())
-                    .then(reports => {
-                        // Log the fetched reports to the console
-                        console.log('Fetched reports:', reports);
+                // User Role Chart
+                var userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+                var userRoleChart = new Chart(userRoleCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Admin', 'Member'],
+                        datasets: [{
+                            label: 'User Role',
+                            data: [
+                                userData.filter(user => user.user_role === 'Admin').length,
+                                userData.filter(user => user.user_role === 'Member').length
+                            ],
+                            backgroundColor: ['#FFCE56', '#4CAF50']
+                        }]
+                    }
+                });
 
-                        // Process the reports data as needed
-                        displayReports(reports);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching reports:', error);
-                        // Handle errors as needed
-                    });
+                // User Status Chart
+                var userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
+                var userStatusChart = new Chart(userStatusCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Active', 'Inactive'],
+                        datasets: [{
+                            label: 'User Status',
+                            data: [
+                                userData.filter(user => user.user_status === 'Active').length,
+                                userData.filter(user => user.user_status === 'Inactive').length
+                            ],
+                            backgroundColor: ['#36A2EB', '#FF6384']
+                        }]
+                    }
+                });
             }
 
-            // Add the displayReports function
-            function displayReports(reports) {
-                // Log the reports data to the console
-                console.log('Displaying reports:', reports);
+            // Event listener for the "Reports" link
+            document.getElementById("reportsLink").addEventListener("click", function () {
+                var reports = document.getElementById("reports");
+                reports.style.display = 'block';
 
-                // Implement your code to display reports on the page using colored bargraphs
-            }
+                // // Fetch user data for generating reports
+                // var xhr = new XMLHttpRequest();
+                // xhr.open("GET", "/admin/reports", true);
+
+                // xhr.onreadystatechange = function () {
+                //     if (xhr.readyState === 4 && xhr.status === 200) {
+                //         var userData = JSON.parse(xhr.responseText);
+                //         displayReports(userData);
+                //     }
+                // };
+
+                // xhr.send();
+            });
+
+
+
+
+
+
+
+
+        // document.getElementById("reportsLink").addEventListener("click", function () {
+        //     var reports = document.getElementById("reports");
+        //     reports.style.display = 'block';
+        
+        //     console.log("Reports link clicked");
+        //     fetchReports(); // Ensure fetchReports function is correctly defined
+        // });
+
+        //     // Add the fetchReports function
+        //     function fetchReports() {
+        //         // Fetch reports from the server using AJAX
+        //         fetch('/admin/reports')
+        //             .then(response => response.json())
+        //             .then(reports => {
+        //                 // Log the fetched reports to the console
+        //                 console.log('Fetched reports:', reports);
+
+        //                 // Process the reports data as needed
+        //                 displayReports(reports);
+        //             })
+        //             .catch(error => {
+        //                 console.error('Error fetching reports:', error);
+        //                 // Handle errors as needed
+        //             });
+        //     }
+
+        //     // Add the displayReports function
+        //     function displayReports(reports) {
+        //         // Log the reports data to the console
+        //         console.log('Displaying reports:', reports);
+        //         var reportsContainer = document.getElementById("reportsContainer");
+        //         reportsContainer.innerHTML = "";
+
+        //         // Iterate through the reports data and create elements
+        //         reportsData.forEach(function (report) {
+        //             var reportElement = document.createElement("div");
+        //             reportElement.innerHTML = `
+        //         <p>${report.user_sex}: ${report.count} users</p>
+        //         <p>${report.user_role}: ${report.count} users</p>
+        //         <p>${report.user_status}: ${report.count} users</p>
+        //     `;
+
+        //             reportsContainer.appendChild(reportElement);
+        //         });
+        //     }
+
         //===============================================
 
     </script>

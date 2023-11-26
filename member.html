@@ -43,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="container mt-4" id="variablePage">
+    <div class="container mt-4" id="variablePage">RED
         <!-- Content will be dynamically loaded here based on menu selection -->
     </div>
 
@@ -56,6 +56,24 @@
         <div class="col-md-6">
             <!-- Event Description -->
             <p id="eventDescription">Event Description</p>
+        </div>
+    </div>
+
+    <!-- Add a new div for the profile information -->
+    <div class="row" id="profileInfo" style="display: none;">
+        <div class="col-md-6">
+            <!-- Profile Information -->
+            <h2 id="profileTitle">My Profile</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" id="username">Username</h5>
+                    <p class="card-text" id="userSex">Sex: </p>
+                    <p class="card-text" id="userRole">Role: </p>
+                    <p class="card-text" id="userStatus">Status: </p>
+                    <button class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+                    <button class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -73,6 +91,13 @@
         function showContent(content) {
             document.getElementById("variablePage").innerHTML = content;
         }
+
+        // Function to show the profile information
+        function showProfileInfo() {
+            document.getElementById("profileInfo").style.display = 'block';
+            document.getElementById("post").style.display = 'none'; // Hide the event content
+        }
+
         var rediet = homePage();
 
         // Set the home page as the initial content
@@ -115,7 +140,7 @@
                 <div class="card-body">
                     <h5 class="card-title">${event.event_title}</h5>
                 </div>
-                <img src="/assets/images/computer_science_and_engineering_club_cover.jpeg" class="card-img-top event-image" alt="Event Image">
+                <img src="/assets/images/computer_science_and_engineering_club_logo.jpeg" class="card-img-top event-image" alt="Event Image">
 
                 <div class="card-body">
                     <p class="card-text">${event.event_description}</p>
@@ -130,11 +155,32 @@
                 post.appendChild(eventContainer);
             }
 
-        //=========================Event Area=========================
-        document.getElementById("eventsLink").addEventListener("click", function () {
-            // Add your events content here
-            showContent("<h2>Events</h2><p>Upcoming Events...</p>");
-        });
+        //========================= MY PROFILE =========================
+        // Event listener for "My Profile" link
+            document.getElementById("profileDropdown").addEventListener("click", function () {
+                showProfileInfo();
+
+                // Fetch profile information from the server using AJAX
+                fetch('/api/profileInfo',{credentials: 'include'})
+                    .then(response => response.json())
+                    .then(profileInfo => {
+                        // Display profile information on the page
+                        displayProfileInfo(profileInfo);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching profile information:', error);
+                        // Handle errors as needed
+                    });
+            });
+
+            // Function to display profile information on the page
+            function displayProfileInfo(profileInfo) {
+                document.getElementById("username").innerText = 'Username: ' + profileInfo.user_name;
+                document.getElementById("userSex").innerText = 'Sex: ' + profileInfo.user_sex;
+                document.getElementById("userRole").innerText = 'Role: ' + profileInfo.user_role;
+                document.getElementById("userStatus").innerText = 'Status: ' + profileInfo.user_status;
+            }
+
         //=============================================================
 
         //==================Edit password area==================================
@@ -178,6 +224,21 @@
                         // Handle the error, e.g., show an error message
                     });
             }
+
+            // Example client-side code
+                fetch('http://localhost:3200/api/profileInfo')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // Log the retrieved data
+                        // Handle the retrieved data as needed
+                    })
+                    .catch(error => {
+                        console.error('Error fetching profile information:', error);
+                        // Handle errors as needed
+                    });
+                
+
+
 
         //=============================================================
     </script>
