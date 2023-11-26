@@ -360,6 +360,27 @@ app.put("/admin/edit-user/:userId/:newRole", function (req, res) {
 
 //========================================================================
 
+// Handle GET requests for fetching events   FOR MEMBERS
+app.get("/api/events3", function (req, res) {
+    // Fetch events from the events table in descending order of event_id (assuming event_id is an auto-incrementing primary key)
+    connection.query("SELECT * FROM events ORDER BY event_id DESC", function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+        // Update the image paths to include the correct URL prefix
+        const eventsWithRelativePaths = results.map(event => {
+            return {
+                ...event,
+                event_image: `/assets/images/${event.event_image}`
+            };
+        });
+
+        res.json(eventsWithRelativePaths);
+    });
+});
+
 
 //========================Event Things===================================
 
@@ -381,9 +402,6 @@ app.get("/api/events2", function (req, res) {
         });
 
         res.json(eventsWithRelativePaths);
-
-        // Respond with the fetched events in JSON format
-        res.json(results);
     });
 });
 

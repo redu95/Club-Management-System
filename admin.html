@@ -44,7 +44,7 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="homeLink">Home<span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="#" id="homeLink">Home</a>
                 </li>
                 <li class="nav-item active">
                     <a class="nav-link" id="membersLink" href="#">Members List </a>
@@ -212,7 +212,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-                 
+         // Trigger the click event for the "Home" link when the page loads
+            window.onload = function () {
+                document.getElementById("homeLink").click();
+            };        
         // Function to display user data in the membersTable
         function displayUserData(users) {
             var membersTable = document.getElementById("membersTable");
@@ -398,6 +401,7 @@
         //===================Event Things=============
         // Event listener for the "Home" link
             document.getElementById("homeLink").addEventListener("click", function () {
+                //window.location.reload();
                 var NewPostBtn = document.getElementById("NewPostBtn");
                 var post = document.getElementById("post");
                 NewPostBtn.style.display = 'block';
@@ -429,15 +433,15 @@
                         var eventCard = document.createElement("div");
                         eventCard.className = "card event-card";
                         eventCard.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${event.event_title}</h5>
-                </div>
-                <img src="/assets/images/computer_science_and_engineering_club_cover.jpeg" class="card-img-top event-image" alt="Event Image">
+                    <div class="card-body">
+                        <h5 class="card-title">${event.event_title}</h5>
+                    </div>
+                    <img src="/assets/images/computer_science_and_engineering_club_cover.jpeg" class="card-img-top event-image" alt="Event Image">
 
-                <div class="card-body">
-                    <p class="card-text">${event.event_description}</p>
-                </div>
-            `;
+                    <div class="card-body">
+                        <p class="card-text">${event.event_description}</p>
+                    </div>
+                `;
 
                         // Append the eventCard to the eventContainer
                         eventContainer.appendChild(eventCard);
@@ -476,9 +480,10 @@
         //===================Reports===================
 
         document.getElementById("reportsLink").addEventListener("click", function () {
+                window.location.reload();
                 console.log("Reports link clicked");
                 fetchReports(); // Ensure fetchReports function is correctly defined
-            });
+        });
 
             // Add the fetchReports function
             function fetchReports() {

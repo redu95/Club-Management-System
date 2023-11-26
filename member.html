@@ -8,6 +8,19 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/member.css">
+    <style>
+        .event-card {
+            width: 70%;
+            margin: 20px auto;
+        }
+    
+        .event-image {
+            max-height: 300px;
+            /* Set a maximum height for the event image */
+            object-fit: cover;
+            /* Ensure the image covers the container */
+        }
+    </style>
 </head>
 
 <body>
@@ -23,19 +36,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="homeLink">Home</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="eventsLink">Events</a>
-                </li>
-
                 <li class="nav-item dropdown ml-auto">
-                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        My Profile
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="profileDropdown">
-                        <a class="dropdown-item" href="#" id="editProfileLink">Edit Profile</a>
-                    </div>
+                    <a class="nav-link" href="#" id="profileDropdown"> My Profile</a>
                 </li>
             </ul>
         </div>
@@ -45,35 +47,20 @@
         <!-- Content will be dynamically loaded here based on menu selection -->
     </div>
 
-
-    <!---Modal for edit password-->
-    <div class="modal fade" id="editPasswordModal" tabindex="-1" role="dialog" aria-labelledby="editPasswordModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editPasswordModalLabel">Edit Password</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Form for changing password -->
-                    <form id="editPasswordForm">
-                        <div class="form-group">
-                            <label for="oldPassword">Old Password</label>
-                            <input type="password" class="form-control" id="oldPassword" name="oldPassword" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="newPassword">New Password</label>
-                            <input type="password" class="form-control" id="newPassword" name="newPassword" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Change Password</button>
-                    </form>
-                </div>
-            </div>
+    <div class="row" id="post" style="display: none;">
+        <div class="col-md-6">
+            <!-- Event Image -->
+            <h2 id="eventTitle">Event Titile</h2>
+            <img id="eventImage" class="img-fluid" alt="Event Image">
+        </div>
+        <div class="col-md-6">
+            <!-- Event Description -->
+            <p id="eventDescription">Event Description</p>
         </div>
     </div>
+
+
+    
 
 
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
@@ -86,14 +73,62 @@
         function showContent(content) {
             document.getElementById("variablePage").innerHTML = content;
         }
+        var rediet = homePage();
 
         // Set the home page as the initial content
-        showContent("<img src='assets/images/computer_science_and_engineering_club_cover.jpeg' alt='Welcome Image'><h2>Welcome to CSEC ASTU Club Management</h2>");
+        showContent(rediet);
 
         // Event listeners for menu items
         document.getElementById("homeLink").addEventListener("click", function () {
-            showContent("<img src='assets/images/computer_science_and_engineering_club_cover.jpeg' alt='Welcome Image'><h2>Welcome to CSEC ASTU Club Management</h2>");
+            showContent(rediet);
         });
+        // FUNCTION
+        function homePage(){
+            var post = document.getElementById("post");
+            post.style.display = 'block';
+
+            // Fetch events from the server using AJAX
+            fetch('/api/events3')
+                .then(response => response.json())
+                .then(events => {
+                    // Display events on the page
+                    displayEvents(events);
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    // Handle errors as needed
+                });
+        }
+         // Function to display events on the page
+            function displayEvents(events) {
+                var post = document.getElementById("post");
+                var eventContainer = document.createElement("div");
+
+                // Clear previous content
+                post.innerHTML = "";
+
+                // Display each event in a Bootstrap card
+                events.forEach(function (event) {
+                    var eventCard = document.createElement("div");
+                    eventCard.className = "card event-card";
+                    eventCard.innerHTML = `
+                <div class="card-body">
+                    <h5 class="card-title">${event.event_title}</h5>
+                </div>
+                <img src="/assets/images/computer_science_and_engineering_club_cover.jpeg" class="card-img-top event-image" alt="Event Image">
+
+                <div class="card-body">
+                    <p class="card-text">${event.event_description}</p>
+                </div>
+            `;
+
+                    // Append the eventCard to the eventContainer
+                    eventContainer.appendChild(eventCard);
+                });
+
+                // Append the eventContainer to the post
+                post.appendChild(eventContainer);
+            }
 
         //=========================Event Area=========================
         document.getElementById("eventsLink").addEventListener("click", function () {
