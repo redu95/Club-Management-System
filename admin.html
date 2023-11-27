@@ -8,16 +8,12 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/admin.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    
+    <!-- Chart.js CSS (if needed) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">  
 
-    <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Add this CSS in your <head> section for styling the event cards -->
-    <!-- Add this CSS in your <head> section for styling the event cards -->
+  
+   <!-- Add this CSS in your <head> section f in your <head> section for styling the event cards -->
     <style>
         .event-card {
             width: 70%;
@@ -29,6 +25,13 @@
             /* Set a maximum height for the event image */
             object-fit: cover;
             /* Ensure the image covers the container */
+        }
+        .page-content {
+            display: none;
+        }
+
+        .active {
+            display: block;
         }
     </style>
 </head>
@@ -50,160 +53,285 @@
                     <a class="nav-link" id="membersLink" href="#">Members List </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" id="reportsLink">ReportsPP</a>
+                    <a class="nav-link" href="#" id="reportsLink">Reports</a>
+                </li>
+                <li class="nav-item dropdown ml-auto">
+                    <a class="nav-link" href="#" id="profileDropdown"> My Profile</a>
                 </li>
             </ul>
         </div>
     </nav>
 
-    <!-- Home Div -->
-    <div class="container mt-5">
+    <div class="container mt-4" id="variablePage">
+        <!-- Content will be dynamically loaded here based on menu selection -->
+    </div>
 
-        <!-- Add New Post Button -->
-        <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal" id="NewPostBtn" style="display: none;">
-            Add New Post
-        </button>
+    <!-- Home Page Content -->
+    <div class="container mt-5 page-content" id="homeContent">
+        <div class="container mt-5">
         
-        <!-- Add Post Modal -->
-        <div class="modal" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel" aria-hidden="true">
+            <!-- Add New Post Button -->
+            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal" id="NewPostBtn"
+                style="display: none;">
+                Post New Event +
+            </button>
+        
+            <!-- Add Post Modal -->
+            <div class="modal" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addPostModalLabel">Add New Post</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Form to input new post data -->
+                            <form id="addPostForm" action="/api/events" method="POST">
+                                <div class="form-group">
+                                    <label for="eventImage">Event Image</label>
+                                    <input type="file" class="form-control-file" name="event_image" accept="image/*" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventTitle">Event Title</label>
+                                    <input type="text" class="form-control" name="event_title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventDescription">Event Description</label>
+                                    <textarea class="form-control" name="event_description" rows="3" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Post</button>
+                            </form>
+        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="row" id="post" style="display: none;">
+                <div class="col-md-6">
+                    <!-- Event Image -->
+                    <h2 id="eventTitle">Event Titile</h2>
+                    <img id="eventImage" class="img-fluid" alt="Event Image">
+                </div>
+                <div class="col-md-6">
+                    <!-- Event Description -->
+                    <p id="eventDescription">Event Description</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Members Page Content -->
+    <div class="container mt-5 page-content" id="membersContent">
+        <!-- Add Member Button -->
+        <div class="container mt-4" id="addbtn" style="display: none;">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">
+                Add Member
+            </button>
+        </div>
+
+        <!-- Container to display members' data -->
+        <div class="container mt-4" id="tableHead" style="display: none;">
+            <table class="table" id="membersTable">
+                <thead class="thead-dark">
+                    <!-- Table header with column names -->
+                    <tr>
+                        <th> ID</th>
+                        <th>User Name</th>
+                        <th>Sex</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Add Member Modal -->
+        <div class="modal" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addPostModalLabel">Add New Post</h5>
+                        <h5 class="modal-title" id="addMemberModalLabel">Add Member</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Form to input new post data -->
-                        <form id="addPostForm" action="/api/events" method="POST">
+                        <!-- Form for adding a new member -->
+                        <form id="addMemberForm">
                             <div class="form-group">
-                                <label for="eventImage">Event Image</label>
-                                <input type="file" class="form-control-file" name="event_image" accept="image/*" required>
+                                <label for="newUserName">User Name</label>
+                                <input type="text" class="form-control" id="newUserName" required>
                             </div>
                             <div class="form-group">
-                                <label for="eventTitle">Event Title</label>
-                                <input type="text" class="form-control" name="event_title" required>
+                                <label for="newUserPassword">User Password</label>
+                                <input type="password" class="form-control" id="newUserPassword" required>
                             </div>
                             <div class="form-group">
-                                <label for="eventDescription">Event Description</label>
-                                <textarea class="form-control" name="event_description" rows="3" required></textarea>
+                                <label for="newUserRole">User Role</label>
+                                <input type="text" class="form-control" id="newUserRole" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Post</button>
+                            <div class="form-group">
+                                <label for="newUserSex">Sex</label>
+                                <input type="text" class="form-control" id="newUserSex" required>
+                            </div>
+        
+                            <button type="submit" class="btn btn-primary">Save</button>
                         </form>
-
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row" id="post" style="display: none;">
-            <div class="col-md-6">
-                <!-- Event Image -->
-                <h2 id="eventTitle">Event Titile</h2>
-                <img id="eventImage" class="img-fluid" alt="Event Image">
-            </div>
-            <div class="col-md-6">
-                <!-- Event Description -->
-                <p id="eventDescription">Event Description</p>
+        <!-- Edit User Modal -->
+        <div class="modal" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Form to edit user data -->
+                        <form id="editUserForm">
+                            <div class="form-group">
+                                <label for="newUserRole">New Role</label>
+                                <input type="text" class="form-control" id="editRoleInput" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newUserStatus">New Status</label>
+                                <input type="text" class="form-control" id="editStatusInput" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
-
-    <!---Memeber List Div--->
-    <!-- Add Member Button -->
-    <div class="container mt-4" id="addbtn" style="display: none;">
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">
-            Add Member
-        </button>
-    </div>
-
-
-    <!-- Container to display members' data -->
-    <div class="container mt-4" id="tableHead" style="display: none;">
-        <table class="table" id="membersTable">
-            <thead class="thead-dark">
-                <!-- Table header with column names -->
-                <tr>
-                    <th> ID</th>
-                    <th>User Name</th>
-                    <th>Sex</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated here -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Add Member Modal -->
-    <div class="modal" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addMemberModalLabel">Add Member</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    
+    <!-- Reports Page Content -->
+    <div class="container mt-5 page-content" id="reportsContent">
+        <!-- Reports Div -->
+        <div class="container mt-5" id="reports" style="display:none;">
+            <!-- User Sex Report -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>User Sex Report</h3>
+                    <canvas id="userSexChart"></canvas>
                 </div>
-                <div class="modal-body">
-                    <!-- Form for adding a new member -->
-                    <form id="addMemberForm">
-                        <div class="form-group">
-                            <label for="newUserName">User Name</label>
-                            <input type="text" class="form-control" id="newUserName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="newUserPassword">User Password</label>
-                            <input type="password" class="form-control" id="newUserPassword" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="newUserRole">User Role</label>
-                            <input type="text" class="form-control" id="newUserRole" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="newUserSex">Sex</label>
-                            <input type="text" class="form-control" id="newUserSex" required>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
+            </div>
+        
+            <!-- User Role Report -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>User Role Report</h3>
+                    <canvas id="userRoleChart"></canvas>
+                </div>
+            </div>
+        
+            <!-- User Status Report -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>User Status Report</h3>
+                    <canvas id="userStatusChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
-    <!------------------------------------------------------------------------------------>
 
-    <!-- Reports Div -->
-    <div class="container mt-5" id="reports" style="display:none;">
-        <!-- User Sex Report -->
-        <div class="row mt-4">
+    <div class="container mt-5 page-content" id="profileContent">
+        <!-- Add a new div for the profile information -->
+        <div class="container mt-4" id="profileInfo" style="display: none;">
             <div class="col-md-6">
-                <h3>User Sex Report</h3>
-                <canvas id="userSexChart"></canvas>
+                <!-- Profile Information -->
+                <h2 id="profileTitle">My Profile</h2>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title" id="username">Username</h5>
+                        <p class="card-text" id="userSex">Sex: </p>
+                        <p class="card-text" id="userRole">Role: </p>
+                        <p class="card-text" id="userStatus">Status: </p>
+                        <button class="btn btn-primary" id="editProfileBtn">Edit Profile</button>
+                        <button class="btn btn-primary" id="changePasswordBtn">Change Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Edit Profile Modal -->
+        <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProfileForm">
+                            <div class="form-group">
+                                <label for="editUsername">Username</label>
+                                <input type="text" class="form-control" id="editUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editUserSex">Sex</label>
+                                <select class="form-control" id="editUserSex" required>
+                                    <option value="Male">M</option>
+                                    <option value="Female">F</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveChangesEditProfile">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- User Role Report -->
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h3>User Role Report</h3>
-                <canvas id="userRoleChart"></canvas>
-            </div>
-        </div>
-
-        <!-- User Status Report -->
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <h3>User Status Report</h3>
-                <canvas id="userStatusChart"></canvas>
+        <!-- Change Password Modal -->
+        <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="changePasswordForm">
+                            <div class="form-group">
+                                <label for="oldPassword">Old Password</label>
+                                <input type="password" class="form-control" id="oldPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" class="form-control" id="newPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveChangesChangePassword">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+   
+    
     <!------------------------------------------------------------------------------------>
 
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
@@ -212,10 +340,40 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
     <script>
-         // Trigger the click event for the "Home" link when the page loads
-            window.onload = function () {
-                document.getElementById("homeLink").click();
-            };        
+        // Show the home page by default
+            showHomePage();
+        // Function to hide all pages
+        function hideAllPages() {
+            var pages = document.querySelectorAll('.page-content');
+            pages.forEach(function (page) {
+                page.classList.remove("active");
+            });
+        }
+
+        
+        // Function to show content for the home page
+        function showHomePage() {
+            hideAllPages();
+            document.getElementById("homeContent").classList.add("active");
+            homePage();
+        }
+
+        // Function to show content for the members page
+        function showMembersPage() {
+            hideAllPages();
+            document.getElementById("membersContent").classList.add("active");
+        }
+
+        // Function to show content for the reports page
+        function showReportsPage() {
+            hideAllPages();
+            document.getElementById("reportsContent").classList.add("active");
+        }
+        function showProfilePage(){
+            hideAllPages();
+            document.getElementById("profileContent").classList.add("active");
+        }
+
         // Function to display user data in the membersTable
         function displayUserData(users) {
             var membersTable = document.getElementById("membersTable");
@@ -241,10 +399,10 @@
 
                 // Add buttons for each row
                 var editButton = document.createElement("button");
-                editButton.textContent = "Edit Role";
+                editButton.textContent = "Edit";
                 editButton.className = "admin-btn";
                 editButton.addEventListener("click", function () {
-                    editUser(user.user_id, user.user_role);
+                   showEditModal(user.user_id, user.user_role, user.user_status);
                 });
                 actionCell.appendChild(editButton);
 
@@ -258,27 +416,62 @@
             });
         }
         //=================== Edit user's Role=================
-        // Function to handle editing a user
-        function editUser(userId, currentRole) {
-            // Prompt the user for the new role
-            var newRole = prompt("Enter the new role for the user:", currentRole);
+        // Function to show the edit modal
+            function showEditModal(userId, currentRole, currentStatus) {
+                // Populate the modal with the current role and status
+                document.getElementById("editUserModal").dataset.userId = userId;
+                document.getElementById("editRoleInput").value = currentRole;
+                document.getElementById("editStatusInput").value = currentStatus;
 
-            if (newRole !== null) {
-                // Send an AJAX request to update the user's role in the database
-                var xhr = new XMLHttpRequest();
-                xhr.open("PUT", "/admin/edit-user/" + userId + "/" + newRole, true);
-
-
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        // Refresh the member list after editing
-                        fetchMemberData();
-                    }
-                };
-
-                xhr.send();
+                // Show the modal
+                $('#editUserModal').modal('show');
             }
-        }
+        // Function to handle editing a user
+            function editUser(userId, currentRole, currentStatus) {
+                // Prompt the user for the new role and status
+                var newRole = currentRole;
+                var newStatus = currentStatus;
+                
+                
+
+                if (newRole !== null && newStatus !== null) {
+                    // Prepare the data to send in the request body
+                    var data = {
+                        userId: userId,
+                        newRole: newRole,
+                        newStatus: newStatus
+                    };
+
+                    // Send an AJAX request to update the user's role and status in the database
+                    fetch("/admin/edit-user/" + userId, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(data)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Network response was not ok");
+                            }
+                            // Refresh the member list after editing
+                            fetchMemberData();
+                        })
+                        .catch(error => {
+                            console.error("Error updating user role and status:", error);
+                        });
+                }
+            }
+
+            // Add an event listener to the "Save Changes" button in the edit modal
+                document.getElementById("saveChangesBtn").addEventListener("click", function () {
+                    // Retrieve values from the modal
+                    var userId = document.getElementById("editUserModal").dataset.userId;
+                    var currentRole = document.getElementById("editRoleInput").value;
+                    var currentStatus = document.getElementById("editStatusInput").value;
+                    editUser(userId, currentRole, currentStatus);
+                });
+
 
         //===================================================
 
@@ -336,17 +529,20 @@
 
             xhr.send();
         }
-
-
-
-        // Event listener for the "Members" link
-        document.getElementById("membersLink").addEventListener("click", function () {
+        function membersPage(){
             var addbtn = document.getElementById("addbtn");
             var tableHead = document.getElementById("tableHead");
             addbtn.style.display = 'block';
             tableHead.style.display = 'block';
             // Fetch members' data from the server using AJAX
             fetchMemberData();
+        }
+
+
+        // Event listener for the "Members" link
+        document.getElementById("membersLink").addEventListener("click", function () {
+            showMembersPage();
+            membersPage();
         });
 
         //==================Add memebers section=============
@@ -399,24 +595,27 @@
         //=====================================================
 
         //===================Event Things=============
+        function homePage(){
+            var NewPostBtn = document.getElementById("NewPostBtn");
+            var post = document.getElementById("post");
+            NewPostBtn.style.display = 'block';
+            post.style.display = 'block';
+
+            // Fetch events from the server using AJAX
+            fetch('/api/events2')
+                .then(response => response.json())
+                .then(events => {
+                    // Display events on the page
+                    displayEvents(events);
+                })
+                .catch(error => {
+                    console.error('Error fetching events:', error);
+                    // Handle errors as needed
+                });
+        }
         // Event listener for the "Home" link
             document.getElementById("homeLink").addEventListener("click", function () {
-                var NewPostBtn = document.getElementById("NewPostBtn");
-                var post = document.getElementById("post");
-                NewPostBtn.style.display = 'block';
-                post.style.display = 'block';
-
-                // Fetch events from the server using AJAX
-                fetch('/api/events2')
-                    .then(response => response.json())
-                    .then(events => {
-                        // Display events on the page
-                        displayEvents(events);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching events:', error);
-                        // Handle errors as needed
-                    });
+               showHomePage();
             });
 
             // Function to display events on the page
@@ -477,9 +676,29 @@
         //==========================================
 
         //===================Reports===================
+            function reportsPage(){
+                var reports = document.getElementById("reports");
+                reports.style.display = 'block';
 
-        // Function to display reports using colored bar graphs
-            function displayReports(userData) {
+                // Fetch reports data for generating charts
+                var xhr = new XMLHttpRequest();
+                xhr.open("GET", "/admin/reports", true);
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var reportData = JSON.parse(xhr.responseText);
+                        displayReports(reportData);
+                    }
+                };
+
+                xhr.send();
+            }
+        // Event listener for the "Reports" link
+            document.getElementById("reportsLink").addEventListener("click", function () {
+                showReportsPage();
+                reportsPage();
+            });
+         function displayReports(reportData) {
                 // User Sex Chart
                 var userSexCtx = document.getElementById('userSexChart').getContext('2d');
                 var userSexChart = new Chart(userSexCtx, {
@@ -489,8 +708,8 @@
                         datasets: [{
                             label: 'User Sex',
                             data: [
-                                userData.filter(user => user.user_sex === 'F').length,
-                                userData.filter(user => user.user_sex === 'M').length
+                                reportData.find(item => item.user_sex === 'F')?.count || 0,
+                                reportData.find(item => item.user_sex === 'M')?.count || 0
                             ],
                             backgroundColor: ['#FF6384', '#36A2EB']
                         }]
@@ -506,8 +725,8 @@
                         datasets: [{
                             label: 'User Role',
                             data: [
-                                userData.filter(user => user.user_role === 'Admin').length,
-                                userData.filter(user => user.user_role === 'Member').length
+                                reportData.find(item => item.user_role === 'Admin')?.count || 0,
+                                reportData.find(item => item.user_role === 'Member')?.count || 0
                             ],
                             backgroundColor: ['#FFCE56', '#4CAF50']
                         }]
@@ -523,89 +742,138 @@
                         datasets: [{
                             label: 'User Status',
                             data: [
-                                userData.filter(user => user.user_status === 'Active').length,
-                                userData.filter(user => user.user_status === 'Inactive').length
+                                reportData.find(item => item.user_status === 'Active')?.count || 0,
+                                reportData.find(item => item.user_status === 'Inactive')?.count || 0
                             ],
                             backgroundColor: ['#36A2EB', '#FF6384']
                         }]
                     }
                 });
             }
+        //===============================================
+        //========================= MY PROFILE =========================
+            // Event listener for "My Profile" link
+            document.getElementById("profileDropdown").addEventListener("click", function () {
+                showProfilePage(); 
+                profilePage();
+            });
+            function profilePage(){
+                var pro =document.getElementById("profileInfo");
+                pro.style.display = 'block';
+                
+                // Fetch profile information from the server using AJAX
+                fetch('/api/profileInfo', { credentials: 'include' })
+                    .then(response => response.json())
+                    .then(profileInfo => {
+                        // Display profile information on the page
+                        displayProfileInfo(profileInfo);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching profile information:', error);
+                        // Handle errors as needed
+                    });
 
-            // Event listener for the "Reports" link
-            document.getElementById("reportsLink").addEventListener("click", function () {
-                var reports = document.getElementById("reports");
-                reports.style.display = 'block';
+            }
 
-                // // Fetch user data for generating reports
-                // var xhr = new XMLHttpRequest();
-                // xhr.open("GET", "/admin/reports", true);
+            // Function to display profile information on the page
+            function displayProfileInfo(profileInfo) {
+                document.getElementById("username").innerText = 'Username: ' + profileInfo.user_name;
+                document.getElementById("userSex").innerText = 'Sex: ' + profileInfo.user_sex;
+                document.getElementById("userRole").innerText = 'Role: ' + profileInfo.user_role;
+                document.getElementById("userStatus").innerText = 'Status: ' + profileInfo.user_status;
+            }
 
-                // xhr.onreadystatechange = function () {
-                //     if (xhr.readyState === 4 && xhr.status === 200) {
-                //         var userData = JSON.parse(xhr.responseText);
-                //         displayReports(userData);
-                //     }
-                // };
+            //==========================Edit Profile===================================
 
-                // xhr.send();
+
+            // Event listener for "Edit Profile" link
+            document.getElementById("editProfileBtn").addEventListener("click", function () {
+                // Fetch profile information from the server using AJAX
+                fetch('/api/profileInfo', { credentials: 'include' })
+                    .then(response => response.json())
+                    .then(profileInfo => {
+                        // Populate the modal with current profile information
+                        document.getElementById("editUsername").value = profileInfo.user_name;
+                        document.getElementById("editUserSex").value = profileInfo.user_sex;
+
+                        // Show the "Edit Profile" modal
+                        $('#editProfileModal').modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching profile information:', error);
+                        // Handle errors as needed
+                    });
             });
 
+            document.getElementById("saveChangesEditProfile").addEventListener("click", function () {
+                // Extract updated username and usersex from the form
+                const newUsername = document.getElementById("editUsername").value;
+                const newUserSex = document.getElementById("editUserSex").value;
 
+                // Make the HTTP POST request to update profile information
+                fetch('/api/editProfile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        newUsername,
+                        newUserSex,
+                    }),
+                    credentials: 'include', // Include credentials for session
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Log the response
+                        // Optionally, you can close the modal
+                        $('#editProfileModal').modal('hide');
+                        // Reload the page or update the displayed information as needed
+                    })
+                    .catch(error => {
+                        console.error('Error updating profile information:', error);
+                        // Handle errors as needed
+                    });
+            });
 
+            //==================Change password area==================================
+            // Event listener for the "Change Password" link
+            document.getElementById("changePasswordBtn").addEventListener("click", function () {
+                // Show the "Change Password" modal
+                $('#changePasswordModal').modal('show');
+            });
 
+            // Updated event listener for the "Save Changes" button in the "Change Password" modal
+            document.getElementById("saveChangesChangePassword").addEventListener("click", function () {
+                // Extract old password and new password from the form
+                const oldPassword = document.getElementById("oldPassword").value;
+                const newPassword = document.getElementById("newPassword").value;
 
+                // Make the HTTP POST request to change the password
+                fetch('/api/changePassword', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        oldPassword,
+                        newPassword,
+                    }),
+                    credentials: 'include', // Include credentials for session
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log(data); // Log the response
+                        // Optionally, you can close the modal
+                        $('#changePasswordModal').modal('hide');
 
-
-
-        // document.getElementById("reportsLink").addEventListener("click", function () {
-        //     var reports = document.getElementById("reports");
-        //     reports.style.display = 'block';
-        
-        //     console.log("Reports link clicked");
-        //     fetchReports(); // Ensure fetchReports function is correctly defined
-        // });
-
-        //     // Add the fetchReports function
-        //     function fetchReports() {
-        //         // Fetch reports from the server using AJAX
-        //         fetch('/admin/reports')
-        //             .then(response => response.json())
-        //             .then(reports => {
-        //                 // Log the fetched reports to the console
-        //                 console.log('Fetched reports:', reports);
-
-        //                 // Process the reports data as needed
-        //                 displayReports(reports);
-        //             })
-        //             .catch(error => {
-        //                 console.error('Error fetching reports:', error);
-        //                 // Handle errors as needed
-        //             });
-        //     }
-
-        //     // Add the displayReports function
-        //     function displayReports(reports) {
-        //         // Log the reports data to the console
-        //         console.log('Displaying reports:', reports);
-        //         var reportsContainer = document.getElementById("reportsContainer");
-        //         reportsContainer.innerHTML = "";
-
-        //         // Iterate through the reports data and create elements
-        //         reportsData.forEach(function (report) {
-        //             var reportElement = document.createElement("div");
-        //             reportElement.innerHTML = `
-        //         <p>${report.user_sex}: ${report.count} users</p>
-        //         <p>${report.user_role}: ${report.count} users</p>
-        //         <p>${report.user_status}: ${report.count} users</p>
-        //     `;
-
-        //             reportsContainer.appendChild(reportElement);
-        //         });
-        //     }
-
-        //===============================================
-
+                        // Reload the page or update the displayed information as needed
+                    })
+                    .catch(error => {
+                        console.error('Error changing password:', error);
+                        // Handle errors as needed
+                    });
+            });
+            //=============================================================
     </script>
 </body>
 

@@ -372,27 +372,30 @@ app.delete("/admin/delete-user/:userId/confirm", function (req, res) {
 
 //================== Edit member role================================
 
-app.put("/admin/edit-user/:userId/:newRole", function (req, res) {
+app.put("/admin/edit-user/:userId", function (req, res) {
     const userId = req.params.userId;
-    const newRole = req.params.newRole;
+    const newRole = req.body.newRole;
+    const newStatus = req.body.newStatus;
 
-    // Update the user's role in the database
+    // Update the user's role and status in the database
     connection.query(
-        "UPDATE loginuser SET user_role = ? WHERE user_id = ?",
-        [newRole, userId],
+        "UPDATE loginuser SET user_role = ?, user_status = ? WHERE user_id = ?",
+        [newRole, newStatus, userId],
         function (error, results, fields) {
             if (error) {
-                console.error("Error updating user role:", error);
+                console.error("Error updating user role and status:", error);
                 res.status(500).send("Internal Server Error");
                 return;
             }
 
             // Respond with a success message
-            res.send("User role updated successfully");
-            console.log("User role updated successfully");
+            res.send("User role and status updated successfully");
+            console.log("User role and status updated successfully");
         }
     );
 });
+
+
 
 
 //========================================================================
@@ -526,7 +529,7 @@ app.get("/api/profileInfo", authenticateUser, function (req, res) {
 //================================================================
 
 // Set the app port
-const PORT = 3400;
+const PORT = 3300;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
