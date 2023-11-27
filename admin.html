@@ -89,7 +89,7 @@
                         </div>
                         <div class="modal-body">
                             <!-- Form to input new post data -->
-                            <form id="addPostForm" action="/api/events" method="POST">
+                            <form id="addPostForm" enctype="multipart/form-data" action="/api/events" method="POST">
                                 <div class="form-group">
                                     <label for="eventImage">Event Image</label>
                                     <input type="file" class="form-control-file" name="event_image" accept="image/*" required>
@@ -622,7 +622,7 @@
                 function displayEvents(events) {
                     var post = document.getElementById("post");
                     var eventContainer = document.createElement("div");
-
+                    
                     // Clear previous content
                     post.innerHTML = "";
 
@@ -631,15 +631,25 @@
                         var eventCard = document.createElement("div");
                         eventCard.className = "card event-card";
                         eventCard.innerHTML = `
-                    <div class="card-body">
-                        <h5 class="card-title">${event.event_title}</h5>
-                    </div>
-                    <img src="data:image/jpeg;base64,${event.event_image}" class="card-img-top event-image" alt="Event Image">
+            <div class="card-body">
+                <h5 class="card-title">${event.event_title}</h5>
+            </div>`;
 
-                    <div class="card-body">
-                        <p class="card-text">${event.event_description}</p>
-                    </div>
-                `;
+                        if (event.event_image !== null) {
+                            try {
+                                const base64Image = event.event_image.toString('base64');
+                                eventCard.innerHTML += `<img src="data:image/jpeg;base64,${base64Image}" class="card-img-top event-image" alt="Event Image">`;
+                            } catch (error) {
+                                console.error('Error converting image to base64:', error);
+                                // Handle errors, e.g., log the error or display a placeholder image
+                                eventCard.innerHTML += `<img src="path/to/placeholder-image.jpg" class="card-img-top event-image" alt="Event Image Placeholder">`;
+                            }
+                        }
+
+                        eventCard.innerHTML += `
+            <div class="card-body">
+                <p class="card-text">${event.event_description}</p>
+            </div>`;
 
                         // Append the eventCard to the eventContainer
                         eventContainer.appendChild(eventCard);
@@ -660,6 +670,11 @@
                 fetch('/api/events', {
                     method: 'POST',
                     body: formData,
+                    headers: {
+                        // Make sure to include the Content-Type header
+                        // with the value 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                    },
                 })
                     .then(response => response.json())
                     .then(data => {
@@ -762,7 +777,7 @@
                 pro.style.display = 'block';
                 
                 // Fetch profile information from the server using AJAX
-                fetch('/api/profileInfo', { credentials: 'include' })
+                fetch('/api/profileInfo2', { credentials: 'include' })
                     .then(response => response.json())
                     .then(profileInfo => {
                         // Display profile information on the page
@@ -789,7 +804,7 @@
             // Event listener for "Edit Profile" link
             document.getElementById("editProfileBtn").addEventListener("click", function () {
                 // Fetch profile information from the server using AJAX
-                fetch('/api/profileInfo', { credentials: 'include' })
+                fetch('/api/profileInfo2', { credentials: 'include' })
                     .then(response => response.json())
                     .then(profileInfo => {
                         // Populate the modal with current profile information
@@ -877,4 +892,14 @@
     </script>
 </body>
 
-</html>
+</html> to update')
+                            }
+                        }
+                    );
+                } else {
+                    res.status(404).send('User not found');
+                }
+            }
+        );
+    } else {
+        res.status(401).json({ error: 'Unauthor

@@ -185,23 +185,26 @@
             function displayEvents(events) {
                 var post = document.getElementById("post");
                 var eventContainer = document.createElement("div");
-
+                
                 // Clear previous content
                 post.innerHTML = "";
 
                 // Display each event in a Bootstrap card
                 events.forEach(function (event) {
-                    var eventCard = document.createElement("div");
-                    eventCard.className = "card event-card";
-                    eventCard.innerHTML = `
-                <div class="card-body">
-                    <h5 class="card-title">${event.event_title}</h5>
-                </div>
-                <img src="data:image/jpeg;base64,${event.event_image}" alt="Event Image">
+                        var eventCard = document.createElement("div");
+                        eventCard.className = "card event-card";
+                        // Strip data URL prefix if present
+                        const imageData = event.event_image.startsWith('data:') ? event.event_image.split(',')[1] : event.event_image;
 
-                <div class="card-body">
-                    <p class="card-text">${event.event_description}</p>
-                </div>
+                        eventCard.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">${event.event_title}</h5>
+                    </div>
+                    <img src="data:image/jpeg;base64,${event.event_image}" class="card-img-top event-image" alt="Event Image">
+
+                    <div class="card-body">
+                        <p class="card-text">${event.event_description}</p>
+                    </div>
             `;
 
                     // Append the eventCard to the eventContainer

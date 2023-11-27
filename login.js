@@ -7,6 +7,8 @@ const cors = require("cors");
 const app = express();
 const fs = require('fs');
 //const bcrypt = require('bcrypt');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Specify the upload directory
 
 app.use("/assets", express.static("assets"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -81,7 +83,7 @@ app.use("/member", authenticateUser);
 app.post("/", encoder, function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    
+
 
     connection.query(
         "SELECT * FROM loginuser WHERE user_name = ? AND user_pass = ?",
@@ -220,29 +222,29 @@ app.post('/api/changePassword', encoder, (req, res) => {
             }
 
             if (results.length > 0) {
-                
+
 
                 // Log relevant information for debugging
                 console.log('Old Password:', oldPassword);
 
 
-                    connection.query(
-                        'UPDATE loginuser SET user_pass = ? WHERE user_id = ?',
-                        [newPassword, userId],
-                        (updateError, updateResults) => {
-                            if (updateError) {
-                                console.error('Password update error:', updateError);
-                                res.status(500).send('Internal Server Error');
-                            } else if (updateResults.affectedRows > 0) {
-                                res.send('Password changed successfully');
-                                console.log('Password changed successfully')
-                                console.log(newPassword)
-                            } else {
-                                res.status(500).send('Failed to update password');
-                                console.log('Failed to update password')
-                            }
+                connection.query(
+                    'UPDATE loginuser SET user_pass = ? WHERE user_id = ?',
+                    [newPassword, userId],
+                    (updateError, updateResults) => {
+                        if (updateError) {
+                            console.error('Password update error:', updateError);
+                            res.status(500).send('Internal Server Error');
+                        } else if (updateResults.affectedRows > 0) {
+                            res.send('Password changed successfully');
+                            console.log('Password changed successfully')
+                            console.log(newPassword)
+                        } else {
+                            res.status(500).send('Failed to update password');
+                            console.log('Failed to update password')
                         }
-                    );
+                    }
+                );
             } else {
                 res.status(404).send('User not found');
             }
@@ -273,7 +275,7 @@ app.post("/", encoder, function (req, res) {
                     role: results[0].user_role,
                 };
 
-                 console.log("Session user:", req.session.user); // Log the session user data
+                console.log("Session user:", req.session.user); // Log the session user data
 
                 // Redirect based on user role
                 if (results[0].user_role === "admin") {
@@ -302,7 +304,7 @@ app.post("/admin/add-user", encoder, function (req, res) {
     var newUserRole = req.body.user_role;
     var newUserSex = req.body.user_sex; // New line
 
-    
+
 
     // Add the new user to the loginuser table
     connection.query(
@@ -410,7 +412,7 @@ app.get("/api/events3", function (req, res) {
             return;
         }
         // Update the image paths to include the correct URL prefix
-        const eventsWithRelativePaths = results.map(event => {
+        const eventsWithBase64Images = results.map(event => {
             const base64Image = event.event_image.toString('base64');
             return {
                 ...event,
@@ -418,7 +420,7 @@ app.get("/api/events3", function (req, res) {
             };
         });
 
-        res.json(eventsWithRelativePaths);
+        res.json(eventsWithBase64Images);
     });
 });
 
@@ -427,20 +429,37 @@ app.get("/api/events3", function (req, res) {
 
 // Handle GET requests for fetching events
 app.get("/api/events2", function (req, res) {
-    // Fetch events from the events table in descending order of event_id (assuming event_id is an auto-incrementing primary key)
+    // Fetch events from the events table in descending order of event_id
     connection.query("SELECT * FROM events ORDER BY event_id DESC", function (error, results, fields) {
         if (error) {
             console.error("Database query error:", error);
             res.status(500).send("Internal Server Error");
             return;
         }
+
         // Update the image paths to include the correct URL prefix
         const eventsWithRelativePaths = results.map(event => {
-            const base64Image = event.event_image.toString('base64');
-            return {
-                ...event,
-                event_image: base64Image,
-            };
+            try {
+                if (event.event_image && Buffer.isBuffer(event.event_image)) {
+                    const base64Image = event.event_image.toString('base64');
+                    return {
+                        ...event,
+                        event_image: base64Image,
+                    };
+                } else {
+                    console.error('Invalid image data format:', event.event_id);
+                    return {
+                        ...event,
+                        event_image: null, // or 'path/to/placeholder-image.jpg'
+                    };
+                }
+            } catch (error) {
+                console.error('Error converting image to base64:', error);
+                return {
+                    ...event,
+                    event_image: null, // or 'path/to/placeholder-image.jpg'
+                };
+            }
         });
 
         res.json(eventsWithRelativePaths);
@@ -448,14 +467,18 @@ app.get("/api/events2", function (req, res) {
 });
 
 
+
 // Handle POST requests for creating events
-app.post("/api/events", function (req, res) {
+app.post("/api/events", upload.single('event_image'), function (req, res) {
     const { event_title, event_image, event_description } = req.body;
     console.log('Received image data:', event_image);
-    // Convert base64-encoded image to buffer
-    const imageBuffer = Buffer.from(event_image, 'base64');
+    // Check if a file was uploaded
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const imageBuffer = req.file.buffer; // Use req.file to access the uploaded file
 
-   
+
     // Add the new event to the events table
     connection.query(
         "INSERT INTO events (event_title, event_image, event_description) VALUES (?, ?, ?)",
@@ -500,6 +523,33 @@ app.get("/admin/reports", function (req, res) {
 
 // Handle GET requests for the user's profile information
 app.get("/api/profileInfo", authenticateUser, function (req, res) {
+    console.log("Session user in /api/profileInfo:", req.session.user);
+    const userId = req.session.user && req.session.user.id;
+    console.log("User ID:", userId); // Log the user ID
+    // Fetch user profile data based on the user ID
+    if (userId) {
+        connection.query("SELECT * FROM loginuser WHERE user_id = ?", [userId], function (error, results, fields) {
+            if (error) {
+                console.error("Database query error:", error);
+                res.status(500).send("Internal Server Error");
+                return;
+            }
+
+            // Check if user data is found
+            if (results.length > 0) {
+                // Return the user data as JSON
+                res.json(results[0]);
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        });
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
+
+// Handle GET requests for the user's profile information
+app.get("/api/profileInfo2", authenticateUser, function (req, res) {
     console.log("Session user in /api/profileInfo:", req.session.user);
     const userId = req.session.user && req.session.user.id;
     console.log("User ID:", userId); // Log the user ID
