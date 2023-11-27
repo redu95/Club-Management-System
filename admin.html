@@ -225,7 +225,7 @@
     <!-- Reports Page Content -->
     <div class="container mt-5 page-content" id="reportsContent">
         <!-- Reports Div -->
-        <div class="container mt-5" id="reports" style="display:none;">
+        <div class="container mt-5">
             <!-- User Sex Report -->
             <div class="row mt-4">
                 <div class="col-md-6">
@@ -254,7 +254,7 @@
 
     <div class="container mt-5 page-content" id="profileContent">
         <!-- Add a new div for the profile information -->
-        <div class="container mt-4" id="profileInfo" style="display: none;">
+        <div class="container mt-5">
             <div class="col-md-6">
                 <!-- Profile Information -->
                 <h2 id="profileTitle">My Profile</h2>
@@ -372,6 +372,7 @@
         function showProfilePage(){
             hideAllPages();
             document.getElementById("profileContent").classList.add("active");
+            document.getElementById("profileInfo").style.display = 'block';
         }
 
         // Function to display user data in the membersTable
@@ -892,14 +893,4 @@
     </script>
 </body>
 
-</html> to update')
-                            }
-                        }
-                    );
-                } else {
-                    res.status(404).send('User not found');
-                }
-            }
-        );
-    } else {
-        res.status(401).json({ error: 'Unauthor
+</html> 
