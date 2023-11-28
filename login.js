@@ -404,23 +404,40 @@ app.put("/admin/edit-user/:userId", function (req, res) {
 
 // Handle GET requests for fetching events   FOR MEMBERS
 app.get("/api/events3", function (req, res) {
-    // Fetch events from the events table in descending order of event_id (assuming event_id is an auto-incrementing primary key)
+    // Fetch events from the events table in descending order of event_id
     connection.query("SELECT * FROM events ORDER BY event_id DESC", function (error, results, fields) {
         if (error) {
             console.error("Database query error:", error);
             res.status(500).send("Internal Server Error");
             return;
         }
+
         // Update the image paths to include the correct URL prefix
-        const eventsWithBase64Images = results.map(event => {
-            const base64Image = event.event_image.toString('base64');
-            return {
-                ...event,
-                event_image: base64Image,
-            };
+        const eventsWithRelativePaths = results.map(event => {
+            try {
+                if (event.event_image && Buffer.isBuffer(event.event_image)) {
+                    const base64Image = event.event_image.toString('base64');
+                    return {
+                        ...event,
+                        event_image: base64Image,
+                    };
+                } else {
+                    console.error('Invalid image data format:', event.event_id);
+                    return {
+                        ...event,
+                        event_image: null, // or 'path/to/placeholder-image.jpg'
+                    };
+                }
+            } catch (error) {
+                console.error('Error converting image to base64:', error);
+                return {
+                    ...event,
+                    event_image: null, // or 'path/to/placeholder-image.jpg'
+                };
+            }
         });
 
-        res.json(eventsWithBase64Images);
+        res.json(eventsWithRelativePaths);
     });
 });
 

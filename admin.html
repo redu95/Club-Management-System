@@ -8,24 +8,26 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/admin.css">
-    
-    <!-- Chart.js CSS (if needed) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js">  
 
-  
-   <!-- Add this CSS in your <head> section f in your <head> section for styling the event cards -->
+    <!-- Chart.js CSS (if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+    <!-- Add this CSS in your <head> section f in your <head> section for styling the event cards -->
     <style>
         .event-card {
             width: 70%;
             margin: 20px auto;
         }
-    
+
         .event-image {
             max-height: 300px;
             /* Set a maximum height for the event image */
             object-fit: cover;
             /* Ensure the image covers the container */
         }
+
         .page-content {
             display: none;
         }
@@ -46,17 +48,17 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="homeLink">Home</a>
+                <li class="nav-item active">
+                    <a class="nav-link" id="homeLink" href="#">Home</a>
                 </li>
                 <li class="nav-item active">
-                    <a class="nav-link" id="membersLink" href="#">Members List </a>
+                    <a class="nav-link" id="membersLink" href="#">Members List</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="reportsLink">Reports</a>
+                <li class="nav-item active">
+                    <a class="nav-link" id="reportsLink" href="#">Reports</a>
                 </li>
-                <li class="nav-item dropdown ml-auto">
-                    <a class="nav-link" href="#" id="profileDropdown"> My Profile</a>
+                <li class="nav-item active">
+                    <a class="nav-link" id="profileLink" href="#"> My Profile</a>
                 </li>
             </ul>
         </div>
@@ -69,13 +71,13 @@
     <!-- Home Page Content -->
     <div class="container mt-5 page-content" id="homeContent">
         <div class="container mt-5">
-        
+
             <!-- Add New Post Button -->
-            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal" id="NewPostBtn"
-                style="display: none;">
+            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal"
+                id="NewPostBtn" style="display: none;">
                 Post New Event +
             </button>
-        
+
             <!-- Add Post Modal -->
             <div class="modal" id="addPostModal" tabindex="-1" role="dialog" aria-labelledby="addPostModalLabel"
                 aria-hidden="true">
@@ -92,7 +94,8 @@
                             <form id="addPostForm" enctype="multipart/form-data" action="/api/events" method="POST">
                                 <div class="form-group">
                                     <label for="eventImage">Event Image</label>
-                                    <input type="file" class="form-control-file" name="event_image" accept="image/*" required>
+                                    <input type="file" class="form-control-file" name="event_image" accept="image/*"
+                                        required>
                                 </div>
                                 <div class="form-group">
                                     <label for="eventTitle">Event Title</label>
@@ -100,16 +103,17 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="eventDescription">Event Description</label>
-                                    <textarea class="form-control" name="event_description" rows="3" required></textarea>
+                                    <textarea class="form-control" name="event_description" rows="3"
+                                        required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Post</button>
                             </form>
-        
+
                         </div>
                     </div>
                 </div>
             </div>
-        
+
             <div class="row" id="post" style="display: none;">
                 <div class="col-md-6">
                     <!-- Event Image -->
@@ -123,7 +127,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Members Page Content -->
     <div class="container mt-5 page-content" id="membersContent">
         <!-- Add Member Button -->
@@ -152,7 +156,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Add Member Modal -->
         <div class="modal" id="addMemberModal" tabindex="-1" role="dialog" aria-labelledby="addMemberModalLabel"
             aria-hidden="true">
@@ -183,7 +187,7 @@
                                 <label for="newUserSex">Sex</label>
                                 <input type="text" class="form-control" id="newUserSex" required>
                             </div>
-        
+
                             <button type="submit" class="btn btn-primary">Save</button>
                         </form>
                     </div>
@@ -221,11 +225,11 @@
         </div>
 
     </div>
-    
+
     <!-- Reports Page Content -->
     <div class="container mt-5 page-content" id="reportsContent">
         <!-- Reports Div -->
-        <div class="container mt-5">
+        <div class="container mt-4"  >
             <!-- User Sex Report -->
             <div class="row mt-4">
                 <div class="col-md-6">
@@ -254,7 +258,7 @@
 
     <div class="container mt-5 page-content" id="profileContent">
         <!-- Add a new div for the profile information -->
-        <div class="container mt-5">
+        <div class="container mt-5" id="profileInfo">
             <div class="col-md-6">
                 <!-- Profile Information -->
                 <h2 id="profileTitle">My Profile</h2>
@@ -271,8 +275,8 @@
             </div>
         </div>
         <!-- Edit Profile Modal -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"
+            aria-labelledby="editProfileModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -290,11 +294,12 @@
                             <div class="form-group">
                                 <label for="editUserSex">Sex</label>
                                 <select class="form-control" id="editUserSex" required>
-                                    <option value="Male">M</option>
-                                    <option value="Female">F</option>
+                                    <option value="M">M</option>
+                                    <option value="F">F</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary" id="saveChangesEditProfile">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" id="saveChangesEditProfile">Save
+                                Changes</button>
                         </form>
                     </div>
                 </div>
@@ -302,8 +307,8 @@
         </div>
 
         <!-- Change Password Modal -->
-        <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog"
+            aria-labelledby="changePasswordModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -322,7 +327,8 @@
                                 <label for="newPassword">New Password</label>
                                 <input type="password" class="form-control" id="newPassword" required>
                             </div>
-                            <button type="submit" class="btn btn-primary" id="saveChangesChangePassword">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" id="saveChangesChangePassword">Save
+                                Changes</button>
                         </form>
                     </div>
                 </div>
@@ -330,27 +336,29 @@
         </div>
     </div>
 
-   
-    
+
+
     <!------------------------------------------------------------------------------------>
 
     <!-- Bootstrap JS and Popper.js (required for Bootstrap JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
 
     <script>
         // Show the home page by default
-            showHomePage();
+        showHomePage();
         // Function to hide all pages
         function hideAllPages() {
             var pages = document.querySelectorAll('.page-content');
             pages.forEach(function (page) {
                 page.classList.remove("active");
             });
+        
         }
 
-        
+
         // Function to show content for the home page
         function showHomePage() {
             hideAllPages();
@@ -367,13 +375,27 @@
         // Function to show content for the reports page
         function showReportsPage() {
             hideAllPages();
-            document.getElementById("reportsContent").classList.add("active");
+            document.getElementById("reportsContent").classList.add("active"); 
+            reportsPage();
         }
-        function showProfilePage(){
+
+        function showProfilePage() {
             hideAllPages();
             document.getElementById("profileContent").classList.add("active");
-            document.getElementById("profileInfo").style.display = 'block';
+            fetchProfileInfo();
         }
+        // Event listener for the "Reports" link
+        document.getElementById("reportsLink").addEventListener("click", function () {
+            showReportsPage(); 
+            document.getElementById("reportsContent").classList.add("active"); 
+        });
+        // Event listener for "My Profile" link
+        document.getElementById("profileLink").addEventListener("click", function () {
+            hideAllPages();
+            showProfilePage();
+            document.getElementById("profileContent").classList.add("active");
+            fetchProfileInfo();
+        });
 
         // Function to display user data in the membersTable
         function displayUserData(users) {
@@ -403,7 +425,7 @@
                 editButton.textContent = "Edit";
                 editButton.className = "admin-btn";
                 editButton.addEventListener("click", function () {
-                   showEditModal(user.user_id, user.user_role, user.user_status);
+                    showEditModal(user.user_id, user.user_role, user.user_status);
                 });
                 actionCell.appendChild(editButton);
 
@@ -418,101 +440,101 @@
         }
         //=================== Edit user's Role=================
         // Function to show the edit modal
-            function showEditModal(userId, currentRole, currentStatus) {
-                // Populate the modal with the current role and status
-                document.getElementById("editUserModal").dataset.userId = userId;
-                document.getElementById("editRoleInput").value = currentRole;
-                document.getElementById("editStatusInput").value = currentStatus;
+        function showEditModal(userId, currentRole, currentStatus) {
+            // Populate the modal with the current role and status
+            document.getElementById("editUserModal").dataset.userId = userId;
+            document.getElementById("editRoleInput").value = currentRole;
+            document.getElementById("editStatusInput").value = currentStatus;
 
-                // Show the modal
-                $('#editUserModal').modal('show');
-            }
+            // Show the modal
+            $('#editUserModal').modal('show');
+        }
         // Function to handle editing a user
-            function editUser(userId, currentRole, currentStatus) {
-                // Prompt the user for the new role and status
-                var newRole = currentRole;
-                var newStatus = currentStatus;
-                
-                
+        function editUser(userId, currentRole, currentStatus) {
+            // Prompt the user for the new role and status
+            var newRole = currentRole;
+            var newStatus = currentStatus;
 
-                if (newRole !== null && newStatus !== null) {
-                    // Prepare the data to send in the request body
-                    var data = {
-                        userId: userId,
-                        newRole: newRole,
-                        newStatus: newStatus
-                    };
 
-                    // Send an AJAX request to update the user's role and status in the database
-                    fetch("/admin/edit-user/" + userId, {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(data)
+
+            if (newRole !== null && newStatus !== null) {
+                // Prepare the data to send in the request body
+                var data = {
+                    userId: userId,
+                    newRole: newRole,
+                    newStatus: newStatus
+                };
+
+                // Send an AJAX request to update the user's role and status in the database
+                fetch("/admin/edit-user/" + userId, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        // Refresh the member list after editing
+                        fetchMemberData();
                     })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error("Network response was not ok");
-                            }
-                            // Refresh the member list after editing
-                            fetchMemberData();
-                        })
-                        .catch(error => {
-                            console.error("Error updating user role and status:", error);
-                        });
-                }
+                    .catch(error => {
+                        console.error("Error updating user role and status:", error);
+                    });
             }
+        }
 
-            // Add an event listener to the "Save Changes" button in the edit modal
-                document.getElementById("saveChangesBtn").addEventListener("click", function () {
-                    // Retrieve values from the modal
-                    var userId = document.getElementById("editUserModal").dataset.userId;
-                    var currentRole = document.getElementById("editRoleInput").value;
-                    var currentStatus = document.getElementById("editStatusInput").value;
-                    editUser(userId, currentRole, currentStatus);
-                });
+        // Add an event listener to the "Save Changes" button in the edit modal
+        document.getElementById("saveChangesBtn").addEventListener("click", function () {
+            // Retrieve values from the modal
+            var userId = document.getElementById("editUserModal").dataset.userId;
+            var currentRole = document.getElementById("editRoleInput").value;
+            var currentStatus = document.getElementById("editStatusInput").value;
+            editUser(userId, currentRole, currentStatus);
+        });
 
 
         //===================================================
 
         //==========Deletion of an member===================
         // Function to handle deleting a user
-            function deleteUser(userId) {
-                // Fetch user data for confirmation
-                var xhr = new XMLHttpRequest();
-                xhr.open("DELETE", "/admin/delete-user/" + userId, true);
+        function deleteUser(userId) {
+            // Fetch user data for confirmation
+            var xhr = new XMLHttpRequest();
+            xhr.open("DELETE", "/admin/delete-user/" + userId, true);
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            var confirmationData = JSON.parse(xhr.responseText);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var confirmationData = JSON.parse(xhr.responseText);
 
-                            // Open a modal for confirmation
-                            var confirmDelete = confirm("Are you sure you want to delete this user?\n\n" +
-                                "User ID: " + confirmationData.user.user_id + "\n" +
-                                "User Name: " + confirmationData.user.user_name);
+                        // Open a modal for confirmation
+                        var confirmDelete = confirm("Are you sure you want to delete this user?\n\n" +
+                            "User ID: " + confirmationData.user.user_id + "\n" +
+                            "User Name: " + confirmationData.user.user_name);
 
-                            if (confirmDelete) {
-                                // Send a DELETE request to confirm deletion
-                                var confirmDeleteXhr = new XMLHttpRequest();
-                                confirmDeleteXhr.open("DELETE", "/admin/delete-user/" + userId + "/confirm", true);
+                        if (confirmDelete) {
+                            // Send a DELETE request to confirm deletion
+                            var confirmDeleteXhr = new XMLHttpRequest();
+                            confirmDeleteXhr.open("DELETE", "/admin/delete-user/" + userId + "/confirm", true);
 
-                                confirmDeleteXhr.onreadystatechange = function () {
-                                    if (confirmDeleteXhr.readyState === 4 && confirmDeleteXhr.status === 200) {
-                                        // Refresh the member list after deletion
-                                        fetchMemberData();
-                                    }
-                                };
+                            confirmDeleteXhr.onreadystatechange = function () {
+                                if (confirmDeleteXhr.readyState === 4 && confirmDeleteXhr.status === 200) {
+                                    // Refresh the member list after deletion
+                                    fetchMemberData();
+                                }
+                            };
 
-                                confirmDeleteXhr.send();
-                            }
+                            confirmDeleteXhr.send();
                         }
                     }
-                };
+                }
+            };
 
-                xhr.send();
-            }
+            xhr.send();
+        }
 
         //=================================================
 
@@ -530,7 +552,7 @@
 
             xhr.send();
         }
-        function membersPage(){
+        function membersPage() {
             var addbtn = document.getElementById("addbtn");
             var tableHead = document.getElementById("tableHead");
             addbtn.style.display = 'block';
@@ -548,47 +570,47 @@
 
         //==================Add memebers section=============
         function handleAddMemberForm(event) {
-                event.preventDefault();
+            event.preventDefault();
 
-                // Get form data
-                var newUserName = document.getElementById("newUserName").value;
-                var newUserPassword = document.getElementById("newUserPassword").value;
-                var newUserRole = document.getElementById("newUserRole").value;
-                var newUserSex = document.getElementById("newUserSex").value; // New line
+            // Get form data
+            var newUserName = document.getElementById("newUserName").value;
+            var newUserPassword = document.getElementById("newUserPassword").value;
+            var newUserRole = document.getElementById("newUserRole").value;
+            var newUserSex = document.getElementById("newUserSex").value; // New line
 
-                // Log the values before sending the AJAX request
-                console.log("New User Name:", newUserName);
-                console.log("New User Password:", newUserPassword);
-                console.log("New User Role:", newUserRole);
-                console.log("New User Sex:", newUserSex); // New line
+            // Log the values before sending the AJAX request
+            console.log("New User Name:", newUserName);
+            console.log("New User Password:", newUserPassword);
+            console.log("New User Role:", newUserRole);
+            console.log("New User Sex:", newUserSex); // New line
 
-                // Send an AJAX request to add a new user
-                var xhr = new XMLHttpRequest();
-                xhr.open("POST", "/admin/add-user", true);
-                xhr.setRequestHeader("Content-Type", "application/json");
+            // Send an AJAX request to add a new user
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/admin/add-user", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4) {
-                        if (xhr.status === 200) {
-                            // Refresh the member list after adding a new member
-                            fetchMemberData();
-                            $('#addMemberModal').modal('hide'); // Hide the modal
-                        } else {
-                            // Handle the error case
-                            console.error("Error adding a new member:", xhr.status, xhr.statusText);
-                        }
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        // Refresh the member list after adding a new member
+                        fetchMemberData();
+                        $('#addMemberModal').modal('hide'); // Hide the modal
+                    } else {
+                        // Handle the error case
+                        console.error("Error adding a new member:", xhr.status, xhr.statusText);
                     }
-                };
+                }
+            };
 
-                // Convert data to JSON and send
-                var data = JSON.stringify({
-                    user_name: newUserName,
-                    user_pass: newUserPassword,
-                    user_role: newUserRole,
-                    user_sex: newUserSex // New line
-                });
-                xhr.send(data);
-            }
+            // Convert data to JSON and send
+            var data = JSON.stringify({
+                user_name: newUserName,
+                user_pass: newUserPassword,
+                user_role: newUserRole,
+                user_sex: newUserSex // New line
+            });
+            xhr.send(data);
+        }
 
 
         // Attach the event listener to the form
@@ -596,7 +618,7 @@
         //=====================================================
 
         //===================Event Things=============
-        function homePage(){
+        function homePage() {
             var NewPostBtn = document.getElementById("NewPostBtn");
             var post = document.getElementById("post");
             NewPostBtn.style.display = 'block';
@@ -615,282 +637,275 @@
                 });
         }
         // Event listener for the "Home" link
-            document.getElementById("homeLink").addEventListener("click", function () {
-               showHomePage();
-            });
+        document.getElementById("homeLink").addEventListener("click", function () {
+            showHomePage();
+        });
 
-            // Function to display events on the page
-                function displayEvents(events) {
-                    var post = document.getElementById("post");
-                    var eventContainer = document.createElement("div");
-                    
-                    // Clear previous content
-                    post.innerHTML = "";
+        // Function to display events on the page
+        function displayEvents(events) {
+            var post = document.getElementById("post");
+            var eventContainer = document.createElement("div");
 
-                    // Display each event in a Bootstrap card
-                    events.forEach(function (event) {
-                        var eventCard = document.createElement("div");
-                        eventCard.className = "card event-card";
-                        eventCard.innerHTML = `
+            // Clear previous content
+            post.innerHTML = "";
+
+            // Display each event in a Bootstrap card
+            events.forEach(function (event) {
+                var eventCard = document.createElement("div");
+                eventCard.className = "card event-card";
+                eventCard.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">${event.event_title}</h5>
             </div>`;
 
-                        if (event.event_image !== null) {
-                            try {
-                                const base64Image = event.event_image.toString('base64');
-                                eventCard.innerHTML += `<img src="data:image/jpeg;base64,${base64Image}" class="card-img-top event-image" alt="Event Image">`;
-                            } catch (error) {
-                                console.error('Error converting image to base64:', error);
-                                // Handle errors, e.g., log the error or display a placeholder image
-                                eventCard.innerHTML += `<img src="path/to/placeholder-image.jpg" class="card-img-top event-image" alt="Event Image Placeholder">`;
-                            }
-                        }
+                if (event.event_image !== null) {
+                    try {
+                        const base64Image = event.event_image.toString('base64');
+                        eventCard.innerHTML += `<img src="data:image/jpeg;base64,${base64Image}" class="card-img-top event-image" alt="Event Image">`;
+                    } catch (error) {
+                        console.error('Error converting image to base64:', error);
+                        // Handle errors, e.g., log the error or display a placeholder image
+                        eventCard.innerHTML += `<img src="path/to/placeholder-image.jpg" class="card-img-top event-image" alt="Event Image Placeholder">`;
+                    }
+                }
 
-                        eventCard.innerHTML += `
+                eventCard.innerHTML += `
             <div class="card-body">
                 <p class="card-text">${event.event_description}</p>
             </div>`;
 
-                        // Append the eventCard to the eventContainer
-                        eventContainer.appendChild(eventCard);
-                    });
-
-                    // Append the eventContainer to the post
-                    post.appendChild(eventContainer);
-                }
-
-        
-        document.getElementById('addEventForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-
-                // Get form values
-                const formData = new FormData(this);
-
-                // Send a POST request to the server
-                fetch('/api/events', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        // Make sure to include the Content-Type header
-                        // with the value 'multipart/form-data'
-                        'Content-Type': 'multipart/form-data',
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Handle the response as needed
-                        console.log('Response from server:', data);
-                        // You may want to update the UI or take other actions
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        // Handle errors as needed
-                    });
+                // Append the eventCard to the eventContainer
+                eventContainer.appendChild(eventCard);
             });
+
+            // Append the eventContainer to the post
+            post.appendChild(eventContainer);
+        }
+
+
+        document.getElementById('addEventForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Get form values
+            const formData = new FormData(this);
+
+            // Send a POST request to the server
+            fetch('/api/events', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    // Make sure to include the Content-Type header
+                    // with the value 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response as needed
+                    console.log('Response from server:', data);
+                    // You may want to update the UI or take other actions
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Handle errors as needed
+                });
+        });
 
         //==========================================
 
         //===================Reports===================
-            function reportsPage(){
-                var reports = document.getElementById("reports");
-                reports.style.display = 'block';
+        function reportsPage() {
+            console.log("Entering reportsPage");
 
-                // Fetch reports data for generating charts
-                var xhr = new XMLHttpRequest();
-                xhr.open("GET", "/admin/reports", true);
 
-                xhr.onreadystatechange = function () {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        var reportData = JSON.parse(xhr.responseText);
-                        displayReports(reportData);
-                    }
-                };
+            // Fetch reports data for generating charts
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/admin/reports", true);
 
-                xhr.send();
-            }
-        // Event listener for the "Reports" link
-            document.getElementById("reportsLink").addEventListener("click", function () {
-                showReportsPage();
-                reportsPage();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var reportData = JSON.parse(xhr.responseText);
+                    displayReports(reportData);
+                }
+            };
+
+            xhr.send();
+        }
+        
+        function displayReports(reportData) {
+            // User Sex Chart
+            var userSexCtx = document.getElementById('userSexChart').getContext('2d');
+            var userSexChart = new Chart(userSexCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Female', 'Male'],
+                    datasets: [{
+                        label: 'User Sex',
+                        data: [
+                            reportData.find(item => item.user_sex === 'F')?.count || 0,
+                            reportData.find(item => item.user_sex === 'M')?.count || 0
+                        ],
+                        backgroundColor: ['#FF6384', '#36A2EB']
+                    }]
+                }
             });
-         function displayReports(reportData) {
-                // User Sex Chart
-                var userSexCtx = document.getElementById('userSexChart').getContext('2d');
-                var userSexChart = new Chart(userSexCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Female', 'Male'],
-                        datasets: [{
-                            label: 'User Sex',
-                            data: [
-                                reportData.find(item => item.user_sex === 'F')?.count || 0,
-                                reportData.find(item => item.user_sex === 'M')?.count || 0
-                            ],
-                            backgroundColor: ['#FF6384', '#36A2EB']
-                        }]
-                    }
-                });
 
-                // User Role Chart
-                var userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
-                var userRoleChart = new Chart(userRoleCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Admin', 'Member'],
-                        datasets: [{
-                            label: 'User Role',
-                            data: [
-                                reportData.find(item => item.user_role === 'Admin')?.count || 0,
-                                reportData.find(item => item.user_role === 'Member')?.count || 0
-                            ],
-                            backgroundColor: ['#FFCE56', '#4CAF50']
-                        }]
-                    }
-                });
+            // User Role Chart
+            var userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+            var userRoleChart = new Chart(userRoleCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Admin', 'Member'],
+                    datasets: [{
+                        label: 'User Role',
+                        data: [
+                            reportData.find(item => item.user_role === 'Admin')?.count || 0,
+                            reportData.find(item => item.user_role === 'Member')?.count || 0
+                        ],
+                        backgroundColor: ['#FFCE56', '#4CAF50']
+                    }]
+                }
+            });
 
-                // User Status Chart
-                var userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
-                var userStatusChart = new Chart(userStatusCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Active', 'Inactive'],
-                        datasets: [{
-                            label: 'User Status',
-                            data: [
-                                reportData.find(item => item.user_status === 'Active')?.count || 0,
-                                reportData.find(item => item.user_status === 'Inactive')?.count || 0
-                            ],
-                            backgroundColor: ['#36A2EB', '#FF6384']
-                        }]
-                    }
-                });
-            }
+            // User Status Chart
+            var userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
+            var userStatusChart = new Chart(userStatusCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Active', 'Inactive'],
+                    datasets: [{
+                        label: 'User Status',
+                        data: [
+                            reportData.find(item => item.user_status === 'Active')?.count || 0,
+                            reportData.find(item => item.user_status === 'Inactive')?.count || 0
+                        ],
+                        backgroundColor: ['#36A2EB', '#FF6384']
+                    }]
+                }
+            });
+        }
         //===============================================
         //========================= MY PROFILE =========================
-            // Event listener for "My Profile" link
-            document.getElementById("profileDropdown").addEventListener("click", function () {
-                showProfilePage(); 
-                profilePage();
-            });
-            function profilePage(){
-                var pro =document.getElementById("profileInfo");
-                pro.style.display = 'block';
-                
-                // Fetch profile information from the server using AJAX
-                fetch('/api/profileInfo2', { credentials: 'include' })
-                    .then(response => response.json())
-                    .then(profileInfo => {
-                        // Display profile information on the page
-                        displayProfileInfo(profileInfo);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching profile information:', error);
-                        // Handle errors as needed
-                    });
+        
+        function fetchProfileInfo() {
+            var pro = document.getElementById("profileInfo");
+            pro.style.display = 'block';
 
-            }
-
-            // Function to display profile information on the page
-            function displayProfileInfo(profileInfo) {
-                document.getElementById("username").innerText = 'Username: ' + profileInfo.user_name;
-                document.getElementById("userSex").innerText = 'Sex: ' + profileInfo.user_sex;
-                document.getElementById("userRole").innerText = 'Role: ' + profileInfo.user_role;
-                document.getElementById("userStatus").innerText = 'Status: ' + profileInfo.user_status;
-            }
-
-            //==========================Edit Profile===================================
-
-
-            // Event listener for "Edit Profile" link
-            document.getElementById("editProfileBtn").addEventListener("click", function () {
-                // Fetch profile information from the server using AJAX
-                fetch('/api/profileInfo2', { credentials: 'include' })
-                    .then(response => response.json())
-                    .then(profileInfo => {
-                        // Populate the modal with current profile information
-                        document.getElementById("editUsername").value = profileInfo.user_name;
-                        document.getElementById("editUserSex").value = profileInfo.user_sex;
-
-                        // Show the "Edit Profile" modal
-                        $('#editProfileModal').modal('show');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching profile information:', error);
-                        // Handle errors as needed
-                    });
-            });
-
-            document.getElementById("saveChangesEditProfile").addEventListener("click", function () {
-                // Extract updated username and usersex from the form
-                const newUsername = document.getElementById("editUsername").value;
-                const newUserSex = document.getElementById("editUserSex").value;
-
-                // Make the HTTP POST request to update profile information
-                fetch('/api/editProfile', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        newUsername,
-                        newUserSex,
-                    }),
-                    credentials: 'include', // Include credentials for session
+            // Fetch profile information from the server using AJAX
+            fetch('/api/profileInfo2', { credentials: 'include' })
+                .then(response => response.json())
+                .then(profileInfo => {
+                    // Display profile information on the page
+                    displayProfileInfo(profileInfo);
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log(data); // Log the response
-                        // Optionally, you can close the modal
-                        $('#editProfileModal').modal('hide');
-                        // Reload the page or update the displayed information as needed
-                    })
-                    .catch(error => {
-                        console.error('Error updating profile information:', error);
-                        // Handle errors as needed
-                    });
-            });
+                .catch(error => {
+                    console.error('Error fetching profile information:', error);
+                    // Handle errors as needed
+                });
 
-            //==================Change password area==================================
-            // Event listener for the "Change Password" link
-            document.getElementById("changePasswordBtn").addEventListener("click", function () {
-                // Show the "Change Password" modal
-                $('#changePasswordModal').modal('show');
-            });
+        }
 
-            // Updated event listener for the "Save Changes" button in the "Change Password" modal
-            document.getElementById("saveChangesChangePassword").addEventListener("click", function () {
-                // Extract old password and new password from the form
-                const oldPassword = document.getElementById("oldPassword").value;
-                const newPassword = document.getElementById("newPassword").value;
+        // Function to display profile information on the page
+        function displayProfileInfo(profileInfo) {
+            document.getElementById("username").innerText = 'Username: ' + profileInfo.user_name;
+            document.getElementById("userSex").innerText = 'Sex: ' + profileInfo.user_sex;
+            document.getElementById("userRole").innerText = 'Role: ' + profileInfo.user_role;
+            document.getElementById("userStatus").innerText = 'Status: ' + profileInfo.user_status;
+        }
 
-                // Make the HTTP POST request to change the password
-                fetch('/api/changePassword', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        oldPassword,
-                        newPassword,
-                    }),
-                    credentials: 'include', // Include credentials for session
+        //==========================Edit Profile===================================
+
+
+        // Event listener for "Edit Profile" link
+        document.getElementById("editProfileBtn").addEventListener("click", function () {
+            console.log("clicked");
+            // Fetch profile information from the server using AJAX
+            fetch('/api/profileInfo2', { credentials: 'include' })
+                .then(response => response.json())
+                .then(profileInfo => {
+                    // Populate the modal with current profile information
+                    document.getElementById("editUsername").value = profileInfo.user_name;
+                    document.getElementById("editUserSex").value = profileInfo.user_sex;
+
+                    // Show the "Edit Profile" modal
+                    $('#editProfileModal').modal('show');
                 })
-                    .then(response => response.text())
-                    .then(data => {
-                        console.log(data); // Log the response
-                        // Optionally, you can close the modal
-                        $('#changePasswordModal').modal('hide');
+                .catch(error => {
+                    console.error('Error fetching profile information:', error);
+                    // Handle errors as needed
+                });
+        });
 
-                        // Reload the page or update the displayed information as needed
-                    })
-                    .catch(error => {
-                        console.error('Error changing password:', error);
-                        // Handle errors as needed
-                    });
-            });
-            //=============================================================
+        document.getElementById("saveChangesEditProfile").addEventListener("click", function () {
+            // Extract updated username and usersex from the form
+            const newUsername = document.getElementById("editUsername").value;
+            const newUserSex = document.getElementById("editUserSex").value;
+
+            // Make the HTTP POST request to update profile information
+            fetch('/api/editProfile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    newUsername,
+                    newUserSex,
+                }),
+                credentials: 'include', // Include credentials for session
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data); // Log the response
+                    // Optionally, you can close the modal
+                    $('#editProfileModal').modal('hide');
+                    // Reload the page or update the displayed information as needed
+                })
+                .catch(error => {
+                    console.error('Error updating profile information:', error);
+                    // Handle errors as needed
+                });
+        });
+
+        //==================Change password area==================================
+        // Event listener for the "Change Password" link
+        document.getElementById("changePasswordBtn").addEventListener("click", function () {
+            // Show the "Change Password" modal
+            $('#changePasswordModal').modal('show');
+        });
+
+        // Updated event listener for the "Save Changes" button in the "Change Password" modal
+        document.getElementById("saveChangesChangePassword").addEventListener("click", function () {
+            // Extract old password and new password from the form
+            const oldPassword = document.getElementById("oldPassword").value;
+            const newPassword = document.getElementById("newPassword").value;
+
+            // Make the HTTP POST request to change the password
+            fetch('/api/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    oldPassword,
+                    newPassword,
+                }),
+                credentials: 'include', // Include credentials for session
+            })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data); // Log the response
+                    // Optionally, you can close the modal
+                    $('#changePasswordModal').modal('hide');
+
+                    // Reload the page or update the displayed information as needed
+                })
+                .catch(error => {
+                    console.error('Error changing password:', error);
+                    // Handle errors as needed
+                });
+        });
+        //=============================================================
     </script>
 </body>
 
-</html> 
+</html>

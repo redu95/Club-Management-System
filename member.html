@@ -36,7 +36,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#" id="homeLink">Home</a>
                 </li>
-                <li class="nav-item dropdown ml-auto">
+                <li class="nav-item ">
                     <a class="nav-link" href="#" id="profileDropdown"> My Profile</a>
                 </li>
             </ul>
@@ -67,8 +67,8 @@
                         <div class="form-group">
                             <label for="editUserSex">Sex</label>
                             <select class="form-control" id="editUserSex" required>
-                                <option value="Male">M</option>
-                                <option value="Female">F</option>
+                                <option value="M">M</option>
+                                <option value="F">F</option>
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary" id="saveChangesEditProfile">Save Changes</button>
@@ -162,12 +162,14 @@
 
         // Event listeners for menu items
         document.getElementById("homeLink").addEventListener("click", function () {
-            showContent(rediet);
+            document.getElementById("profileInfo").style.display = 'none';
+            document.getElementById("post").style.display = 'block';
+            homePage();
         });
         // FUNCTION
         function homePage(){
-            var post = document.getElementById("post");
-            post.style.display = 'block';
+           document.getElementById("post").style.display = 'block';
+           
 
             // Fetch events from the server using AJAX
             fetch('/api/events3')
@@ -193,20 +195,27 @@
                 events.forEach(function (event) {
                         var eventCard = document.createElement("div");
                         eventCard.className = "card event-card";
-                        // Strip data URL prefix if present
-                        const imageData = event.event_image.startsWith('data:') ? event.event_image.split(',')[1] : event.event_image;
-
                         eventCard.innerHTML = `
                     <div class="card-body">
                         <h5 class="card-title">${event.event_title}</h5>
-                    </div>
-                    <img src="data:image/jpeg;base64,${event.event_image}" class="card-img-top event-image" alt="Event Image">
+                    </div>`;
 
+                        if (event.event_image !== null) {
+                            try {
+                                const base64Image = event.event_image.toString('base64');
+                                eventCard.innerHTML += `<img src="data:image/jpeg;base64,${base64Image}" class="card-img-top event-image" alt="Event Image">`;
+                            } catch (error) {
+                                console.error('Error converting image to base64:', error);
+                                // Handle errors, e.g., log the error or display a placeholder image
+                                eventCard.innerHTML += `<img src="path/to/placeholder-image.jpg" class="card-img-top event-image" alt="Event Image Placeholder">`;
+                            }
+                        }
+
+                         eventCard.innerHTML += `
                     <div class="card-body">
                         <p class="card-text">${event.event_description}</p>
-                    </div>
-            `;
-
+                    </div>`;
+    
                     // Append the eventCard to the eventContainer
                     eventContainer.appendChild(eventCard);
                 });
