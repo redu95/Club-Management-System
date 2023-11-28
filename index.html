@@ -86,9 +86,9 @@
         document.getElementById("loginForm").addEventListener("submit", function (event) {
             event.preventDefault(); // Prevent form submission to handle it manually
             // Add logic to show/hide divs based on user role
-            if ("<%= user.role %>" === "admin") {
+            if ("<%= user.role %>" === "Admin") {
                 document.getElementById("adminContent").style.display = "block";
-            } else if ("<%= user.role %>" === "member") {
+            } else if ("<%= user.role %>" === "Member") {
                 document.getElementById("memberContent").style.display = "block";
             }
         });

@@ -98,9 +98,9 @@ app.post("/", encoder, function (req, res) {
                 };
 
                 // Redirect based on user role
-                if (results[0].user_role === "admin") {
+                if (results[0].user_role === "Admin") {
                     res.redirect("/admin");
-                } else if (results[0].user_role === "member") {
+                } else if (results[0].user_role === "Member") {
                     res.redirect("/member");
                 } else {
                     res.redirect("/");
@@ -278,9 +278,9 @@ app.post("/", encoder, function (req, res) {
                 console.log("Session user:", req.session.user); // Log the session user data
 
                 // Redirect based on user role
-                if (results[0].user_role === "admin") {
+                if (results[0].user_role === "Admin") {
                     res.redirect("/admin");
-                } else if (results[0].user_role === "member") {
+                } else if (results[0].user_role === "Member") {
                     res.redirect("/member");
                 } else {
                     res.redirect("/");
