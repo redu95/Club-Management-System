@@ -39,6 +39,12 @@
                 <li class="nav-item ">
                     <a class="nav-link" href="#" id="profileDropdown"> My Profile</a>
                 </li>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" id="logoutLink">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -152,13 +158,10 @@
         // Function to show the profile information
         function showProfileInfo() {
             document.getElementById("profileInfo").style.display = 'block';
-            document.getElementById("post").style.display = 'none'; // Hide the event content
+            document.getElementById("post").style.display = 'none'; 
         }
 
         var rediet = homePage();
-
-        // Set the home page as the initial content
-        showContent(rediet);
 
         // Event listeners for menu items
         document.getElementById("homeLink").addEventListener("click", function () {

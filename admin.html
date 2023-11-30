@@ -60,6 +60,11 @@
                 <li class="nav-item active">
                     <a class="nav-link" id="profileLink" href="#"> My Profile</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/logout" id="logoutLink">
+                        <i class="fa fa-sign-out" aria-hidden="true"></i> Logout
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -73,7 +78,7 @@
         <div class="container mt-5">
 
             <!-- Add New Post Button -->
-            <button type="button" class="btn btn-primary mt-3" data-toggle="modal" data-target="#addPostModal"
+            <button type="button" class="btn btn-success mt-3" data-toggle="modal" data-target="#addPostModal"
                 id="NewPostBtn" style="display: none;">
                 Post New Event +
             </button>
@@ -91,7 +96,7 @@
                         </div>
                         <div class="modal-body">
                             <!-- Form to input new post data -->
-                            <form id="addPostForm" enctype="multipart/form-data" action="/api/events" method="POST">
+                            <form id="addEventForm" enctype="multipart/form-data" action="/api/events" method="POST">
                                 <div class="form-group">
                                     <label for="eventImage">Event Image</label>
                                     <input type="file" class="form-control-file" name="event_image" accept="image/*"
@@ -258,7 +263,7 @@
 
     <div class="container mt-5 page-content" id="profileContent">
         <!-- Add a new div for the profile information -->
-        <div class="container mt-5" id="profileInfo">
+        <div class="row" id="profileInfo" style="display: none;">
             <div class="col-md-6">
                 <!-- Profile Information -->
                 <h2 id="profileTitle">My Profile</h2>
@@ -275,8 +280,8 @@
             </div>
         </div>
         <!-- Edit Profile Modal -->
-        <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog"
-            aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
+             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -642,7 +647,7 @@
         });
 
         // Function to display events on the page
-        function displayEvents(events) {
+       function displayEvents(events) {
             var post = document.getElementById("post");
             var eventContainer = document.createElement("div");
 
@@ -660,10 +665,10 @@
 
                 if (event.event_image !== null) {
                     try {
-                        const base64Image = event.event_image.toString('base64');
+                        const base64Image = event.event_image.toString("base64");
                         eventCard.innerHTML += `<img src="data:image/jpeg;base64,${base64Image}" class="card-img-top event-image" alt="Event Image">`;
                     } catch (error) {
-                        console.error('Error converting image to base64:', error);
+                        console.error("Error converting image to base64:", error);
                         // Handle errors, e.g., log the error or display a placeholder image
                         eventCard.innerHTML += `<img src="path/to/placeholder-image.jpg" class="card-img-top event-image" alt="Event Image Placeholder">`;
                     }
@@ -672,6 +677,7 @@
                 eventCard.innerHTML += `
             <div class="card-body">
                 <p class="card-text">${event.event_description}</p>
+                <button class="btn btn-danger prado" data-event-id="${event.event_id}">Delete this event</button>
             </div>`;
 
                 // Append the eventCard to the eventContainer
@@ -680,8 +686,71 @@
 
             // Append the eventContainer to the post
             post.appendChild(eventContainer);
+
+            // Add an event listener to the post container for event delegation
+            post.addEventListener("click", function (event) {
+                // Check if the clicked element has the class "prado"
+                if (event.target.classList.contains("prado")) {
+                    // Get the data-event-id attribute from the clicked button
+                    var eventId = event.target.getAttribute("data-event-id");
+
+                    // Call the deleteEvent function with the retrieved eventId
+                    deleteEvent(eventId);
+                }
+            });
         }
 
+
+
+
+                
+
+        // Function to handle the delete event
+        function deleteEvent(eventId) {
+                // Ask for confirmation before deleting
+                const isConfirmed = confirm("Are you sure you want to delete this event?");
+
+                if (!isConfirmed) {
+                    // User canceled the delete action
+                    return;
+                }
+
+                console.log("sending delete event route..");
+
+                // Send a request to the backend to delete the event with the specified eventId
+                fetch(`/deleteEvent/${eventId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then(function (response) {
+                        if (response.ok) {
+                            // Reload the page to show the added event
+                            location.reload();
+                            console.log("Event deleted successfully");
+                        } else {
+                            // Handle error response from the server
+                            console.error("Error deleting event");
+                        }
+                    })
+                    .catch(function (error) {
+                        // Handle network or fetch error
+                        console.error("Error deleting event:", error);
+                    });
+            }
+
+            // Attach event listeners to delete buttons
+                document.getElementById("post").addEventListener("click", function (event) {
+                    if (event.target.classList.contains("prado")) {
+                        var eventId = event.target.getAttribute("data-event-id");
+                        deleteEvent(eventId);
+                    }
+                });
+
+
+//-----------------------------------------------------------------------
+        
 
         document.getElementById('addEventForm').addEventListener('submit', function (event) {
             event.preventDefault();
@@ -693,31 +762,26 @@
             fetch('/api/events', {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    // Make sure to include the Content-Type header
-                    // with the value 'multipart/form-data'
-                    'Content-Type': 'multipart/form-data',
-                },
             })
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response as needed
                     console.log('Response from server:', data);
-                    // You may want to update the UI or take other actions
+                    // Reload the page to show the added event
+                    location.reload();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     // Handle errors as needed
                 });
+                
         });
 
         //==========================================
 
         //===================Reports===================
         function reportsPage() {
-            console.log("Entering reportsPage");
-
-
+           
             // Fetch reports data for generating charts
             var xhr = new XMLHttpRequest();
             xhr.open("GET", "/admin/reports", true);
@@ -733,57 +797,62 @@
         }
         
         function displayReports(reportData) {
-            // User Sex Chart
-            var userSexCtx = document.getElementById('userSexChart').getContext('2d');
-            var userSexChart = new Chart(userSexCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Female', 'Male'],
-                    datasets: [{
-                        label: 'User Sex',
-                        data: [
-                            reportData.find(item => item.user_sex === 'F')?.count || 0,
-                            reportData.find(item => item.user_sex === 'M')?.count || 0
-                        ],
-                        backgroundColor: ['#FF6384', '#36A2EB']
-                    }]
-                }
-            });
+                // User Sex Chart
+                var userSexCtx = document.getElementById('userSexChart').getContext('2d');
+                var userSexChart = new Chart(userSexCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total', 'Female', 'Male'],
+                        datasets: [{
+                            label: 'User Sex',
+                            data: [
+                                reportData.total_count || 0,
+                                reportData.female_count || 0,
+                                reportData.male_count || 0
+                            ],
+                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                        }]
+                    }
+                });
 
-            // User Role Chart
-            var userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
-            var userRoleChart = new Chart(userRoleCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Admin', 'Member'],
-                    datasets: [{
-                        label: 'User Role',
-                        data: [
-                            reportData.find(item => item.user_role === 'Admin')?.count || 0,
-                            reportData.find(item => item.user_role === 'Member')?.count || 0
-                        ],
-                        backgroundColor: ['#FFCE56', '#4CAF50']
-                    }]
-                }
-            });
+                // User Role Chart
+                var userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+                var userRoleChart = new Chart(userRoleCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total', 'Admin', 'Member'],
+                        datasets: [{
+                            label: 'User Role',
+                            data: [
+                                reportData.total_count || 0,
+                                reportData.admin_count || 0,
+                                reportData.member_count || 0
+                            ],
+                            backgroundColor: ['#FFCE56', '#4CAF50', '#FF6384']
+                        }]
+                    }
+                });
 
-            // User Status Chart
-            var userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
-            var userStatusChart = new Chart(userStatusCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Active', 'Inactive'],
-                    datasets: [{
-                        label: 'User Status',
-                        data: [
-                            reportData.find(item => item.user_status === 'Active')?.count || 0,
-                            reportData.find(item => item.user_status === 'Inactive')?.count || 0
-                        ],
-                        backgroundColor: ['#36A2EB', '#FF6384']
-                    }]
-                }
-            });
-        }
+                // User Status Chart
+                var userStatusCtx = document.getElementById('userStatusChart').getContext('2d');
+                var userStatusChart = new Chart(userStatusCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total', 'Active', 'Inactive'],
+                        datasets: [{
+                            label: 'User Status',
+                            data: [
+                                reportData.total_count || 0,
+                                reportData.active_count || 0,
+                                reportData.inactive_count || 0
+                            ],
+                            backgroundColor: ['#36A2EB', '#FF6384', '#FFCE56']
+                        }]
+                    }
+                });
+            }
+
+
         //===============================================
         //========================= MY PROFILE =========================
         
@@ -837,6 +906,7 @@
         });
 
         document.getElementById("saveChangesEditProfile").addEventListener("click", function () {
+            console.log(" clikeeeed")
             // Extract updated username and usersex from the form
             const newUsername = document.getElementById("editUsername").value;
             const newUserSex = document.getElementById("editUserSex").value;

@@ -7,8 +7,33 @@ const cors = require("cors");
 const app = express();
 const fs = require('fs');
 //const bcrypt = require('bcrypt');
+
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Specify the upload directory
+const storage = multer.memoryStorage(); // Store the file in memory
+const maxSize = 5 * 1024 * 1024; // 5 MB as an example; adjust as needed
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+});
+
+// Middleware to check if the user is authenticated
+const authenticateUser = (req, res, next) => {
+    if (req.session && req.session.user) {
+        console.log(req.session, req.session.use);
+        // User is authenticated, proceed to the next middleware or route
+        console.log("authenticating");
+        return next();
+
+    } else {
+        console.log("from else" + req.session, req.session.use);
+        // User is not authenticated, redirect to the login page
+        console.log("error password! ");
+        res.redirect("/");
+    }
+};
+
+
+
 
 app.use("/assets", express.static("assets"));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,7 +64,7 @@ connection.connect(function (error) {
 });
 
 // Define a route to handle GET requests for the admin dashboard
-app.get("/admin", function (req, res) {
+app.get("/admin", authenticateUser, function (req, res) {
 
     // Fetch data from the loginuser table
     connection.query("SELECT * FROM loginuser", function (error, results, fields) {
@@ -63,16 +88,7 @@ app.use(session({
 }));
 
 
-// Middleware to check if the user is authenticated
-const authenticateUser = (req, res, next) => {
-    if (req.session && req.session.user) {
-        // User is authenticated, proceed to the next middleware or route
-        return next();
-    } else {
-        // User is not authenticated, redirect to the login page
-        res.redirect("/");
-    }
-};
+
 
 // Apply the middleware to routes that require authentication
 app.use("/admin", authenticateUser);
@@ -83,12 +99,14 @@ app.use("/member", authenticateUser);
 app.post("/", encoder, function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-
+    console.log("post is working and "+ username+ "olaa");
+    
 
     connection.query(
         "SELECT * FROM loginuser WHERE user_name = ? AND user_pass = ?",
         [username, password],
         function (error, results, fields) {
+            console.log("resuts= "+ results);
             if (results.length > 0) {
                 // Set session upon successful login
                 req.session.user = {
@@ -96,6 +114,7 @@ app.post("/", encoder, function (req, res) {
                     username: results[0].user_name,
                     role: results[0].user_role,
                 };
+                console.log(results[0].user_name);
 
                 // Redirect based on user role
                 if (results[0].user_role === "Admin") {
@@ -106,10 +125,12 @@ app.post("/", encoder, function (req, res) {
                     res.redirect("/");
                 }
             } else {
+                console.log("error login credentials");
                 res.redirect("/");
             }
         }
     );
+    console.log(username, " ", );
 });
 //--------------------------
 
@@ -130,19 +151,20 @@ app.get("/admin/members", function (req, res) {
 //-----------------------------
 
 // Handle GET requests for the admin dashboard
-app.get("/admin", function (req, res) {
+app.get("/admin", authenticateUser,function (req, res) {
     // Add admin-specific functionalities like member management, event management, reporting
     res.sendFile(__dirname + "/admin.html");
 });
 
 // Handle GET requests for the member area
-app.get("/member", function (req, res) {
+app.get("/member", authenticateUser, function (req, res) {
     // Add member-specific functionalities like viewing personal information, event listing
     res.sendFile(__dirname + "/member.html");
 });
 
 // Serve the login page for both GET and POST requests to "/"
-app.get("/", function (req, res) {
+app.get("/",function (req, res) {
+    console.log("sending index.html")
     res.sendFile(__dirname + "/index.html");
 });
 
@@ -200,7 +222,32 @@ app.post("/api/editProfile", authenticateUser, function (req, res) {
         res.status(401).json({ error: 'Unauthorized' });
     }
 });
+// Handle POST requests for editing profile information
 
+app.post("/api/editProfile12", authenticateUser, function (req, res) { // for admin side
+    const userId = req.session.user && req.session.user.id;
+    const newUsername = req.body.newUsername;
+    const newUserSex = req.body.newUserSex;
+
+    if (userId) {
+        connection.query(
+            "UPDATE loginuser SET user_name = ?, user_sex = ? WHERE user_id = ?",
+            [newUsername, newUserSex, userId],
+            function (error, results, fields) {
+                if (error) {
+                    console.error("Error updating profile information:", error);
+                    res.status(500).send("Internal Server Error");
+                    return;
+                }
+
+                // Respond with a success message
+                res.send("Profile information updated successfully");
+            }
+        );
+    } else {
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+});
 
 
 
@@ -484,17 +531,16 @@ app.get("/api/events2", function (req, res) {
 });
 
 
-
-// Handle POST requests for creating events
+//=======================================================================
 app.post("/api/events", upload.single('event_image'), function (req, res) {
-    const { event_title, event_image, event_description } = req.body;
-    console.log('Received image data:', event_image);
+    const { event_title, event_description } = req.body;
+
     // Check if a file was uploaded
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
-    const imageBuffer = req.file.buffer; // Use req.file to access the uploaded file
 
+    const imageBuffer = req.file.buffer; // Use req.file to access the uploaded file
 
     // Add the new event to the events table
     connection.query(
@@ -509,31 +555,66 @@ app.post("/api/events", upload.single('event_image'), function (req, res) {
 
             // Respond with a success message
             console.log("New event added successfully");
+            res.json({ message: "New event added successfully" });
         }
     );
 });
 
+//===============================================================
+// Update the DELETE route to use a parameter for eventId
+// Change the route definition to include the correct route parameter syntax
+app.delete("/deleteEvent/:eventId", function (req, res) {
+    const eventId = req.params.eventId;
 
-//=======================================================================
+    // Delete the event with the specified eventId from the events table
+    connection.query("DELETE FROM events WHERE event_id = ?", [eventId], function (error, results, fields) {
+        if (error) {
+            console.error("Database query error:", error);
+            res.status(500).send("Internal Server Error");
+            return;
+        }
+
+        if (results.affectedRows === 0) {
+            // No event found with the specified eventId
+            res.status(404).send("Event not found");
+            return;
+        }
+
+        res.status(200).send("Event deleted successfully");
+    });
+});
+
+
 
 //=====================Report Things===============================
 
 // Handle GET requests for reports
 app.get("/admin/reports", function (req, res) {
     // Fetch counts for different categories (sex, role, status)
-    connection.query("SELECT user_sex, user_role, user_status, COUNT(*) as count FROM loginuser GROUP BY user_sex, user_role, user_status", function (error, results, fields) {
+    connection.query(`
+        SELECT 
+            COUNT(*) as total_count,
+            SUM(CASE WHEN user_sex = 'F' THEN 1 ELSE 0 END) as female_count,
+            SUM(CASE WHEN user_sex = 'M' THEN 1 ELSE 0 END) as male_count,
+            SUM(CASE WHEN user_role = 'Admin' THEN 1 ELSE 0 END) as admin_count,
+            SUM(CASE WHEN user_role = 'Member' THEN 1 ELSE 0 END) as member_count,
+            SUM(CASE WHEN user_status = 'Active' THEN 1 ELSE 0 END) as active_count,
+            SUM(CASE WHEN user_status = 'Inactive' THEN 1 ELSE 0 END) as inactive_count
+        FROM loginuser
+    `, function (error, results, fields) {
         if (error) {
-            console.log("ERRor in database");
+            console.log("Error in database");
             console.error("Database query error:", error);
             res.status(500).send("Internal Server Error");
             return;
         }
 
         // Respond with the fetched data in JSON format
-        res.json(results);
-        console.log("Working")
+        res.json(results[0]); // Assuming there is only one row of results
+        console.log("Working");
     });
 });
+
 
 //================================================================
 //========================MY PROFILE=============================
@@ -591,10 +672,14 @@ app.get("/api/profileInfo2", authenticateUser, function (req, res) {
         res.status(401).json({ error: 'Unauthorized' });
     }
 });
-
-
 //================================================================
 
+//------------Logout--------------------------
+app.get("/logout", function (req, res) {
+    // Destroy the session to log out the user
+    req.session.destroy();
+    res.redirect("/");
+});
 // Set the app port
 const PORT = 3300;
 app.listen(PORT, () => {
