@@ -23,3 +23,4 @@ Database Name: 'club'
   Tables:
     'loginuser' (Refer to login.sql)
     'events' (Refer to events.sql)
+    i have included the script files so just import and run them in mysql
