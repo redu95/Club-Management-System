@@ -24,3 +24,10 @@ Database Name: 'club'
     'loginuser' (Refer to login.sql)
     'events' (Refer to events.sql)
     i have included the script files so just import and run them in mysql
+## Testing
+For Memebers:
+        username: fenanyosef@gmail.com
+        password: 456
+For Admin:
+        username:redu95
+        password:000
