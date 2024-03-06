@@ -11,6 +11,7 @@ Club Management System for CSEC ASTU Club. This system, built with Node.js, Expr
 ## Configuration
 Configure MySQL database:
     Create a database named 'club'.
+    Edit the code to set the database url, username and password to yours.
     Use the provided schema files for table creation:
             club.mwb for the overall schema.
             login.sql for the 'loginuser' table.
